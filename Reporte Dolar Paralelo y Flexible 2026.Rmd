@@ -34,7 +34,7 @@ destino_correo <- "roger_miranda_@outlook.com"
 
 # Lista de correos autorizados
 correos_autorizados <- c(
-  "rogerandymiranda01@gmail.com",
+  "prueba123@gmail.com",
   "borja.william@gmail.com"
 )
 
