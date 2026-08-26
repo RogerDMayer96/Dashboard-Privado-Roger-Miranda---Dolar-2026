@@ -242,23 +242,56 @@ tabla_kable
 
 ### Valor Actual - Binance
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-# Traemos también la serie del dólar referencial flexible (BCB) para obtener
-# su último valor publicado y mostrarlo junto al de Binance
+library(httr)
+library(jsonlite)
+library(dplyr)
+library(rvest)
+
+# 1. Obtener la serie histórica mediante la API como lo venías haciendo
 fetch_ultimo_bcb <- function(api_id) {
   res <- GET(paste0("https://usdtbol.com/api/", api_id),
-             query = list(callback = "cb"),
+             query = list(callback = "cb", t = format(Sys.time(), "%s")),
              add_headers("User-Agent" = "Mozilla/5.0", "Referer" = "https://usdtbol.com/"))
   raw <- content(res, "text", encoding = "UTF-8")
   json_clean <- sub("^[a-zA-Z0-9_$]+\\((.*)\\);?$", "\\1", raw)
   data <- fromJSON(json_clean)
-  data.frame(fecha = as.POSIXct(data$times, origin = "1970-01-01"),
-             precio = as.numeric(data$list))
+  
+  t_val <- if (!is.null(data$times) && max(data$times, na.rm = TRUE) > 1e12) data$times / 1000 else data$times
+  
+  data.frame(
+    fecha = as.POSIXct(t_val, origin = "1970-01-01", tz = "UTC"),
+    precio = as.numeric(data$list)
+  )
 }
 
-df_bcb_ultimo <- fetch_ultimo_bcb("d5s4yr95l36h")
+df_bcb_ultimo <- fetch_ultimo_bcb("d5s4yr95l36h") %>% filter(!is.na(precio))
 
+# 2. Extraer el valor real y actualizado directamente del HTML de la web
+webpage <- read_html("https://usdtbol.com/")
+tco_texto <- webpage %>% html_node(".bcb-tco-num") %>% html_text(trim = TRUE)
+precio_real <- as.numeric(gsub(",", ".", tco_texto))
+
+# 3. Fusionar o corregir el último dato en el DataFrame histórico
+# Verificamos si la fecha más alta del histórico corresponde a hoy o si falta agregarla
+hoy <- Sys.Date()
+ultima_fecha_df <- as.Date(max(df_bcb_ultimo$fecha))
+
+if (ultima_fecha_df < hoy) {
+  # Si la API no tiene el registro de hoy, creamos la fila nueva y la añadimos al final
+  nueva_fila <- data.frame(
+    fecha = as.POSIXct(hoy, tz = "UTC"),
+    precio = precio_real
+  )
+  df_bcb_ultimo <- bind_rows(df_bcb_ultimo, nueva_fila)
+} else {
+  # Si el día ya existe pero la API trae el valor desactualizado (ej. 11.50), 
+  # reemplazamos el último precio por el real extraído del HTML (11.54)
+  df_bcb_ultimo$precio[nrow(df_bcb_ultimo)] <- precio_real
+}
+
+# 4. Obtener tu último registro ya corregido para usarlo en el flexdashboard o tus análisis
+ultimo_bcb <- df_bcb_ultimo %>% arrange(fecha) %>% slice_tail(n = 1)
 ultimo_binance <- df %>% arrange(fecha) %>% slice_tail(n = 1)
-ultimo_bcb <- df_bcb_ultimo %>% filter(!is.na(precio)) %>% arrange(fecha) %>% slice_tail(n = 1)
 
 library(flexdashboard)
 valueBox(
@@ -513,44 +546,44 @@ modelo <- auto.arima(ts_semana)
 
 # Creamos variables de impulso 
 ds1 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,1,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
+         1,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#32
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#31
  
 ds2 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,1,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
+         0,0,1,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#34
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#33
 
-ds3 <- c(0,0,0,0,0,0,0,1,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
+ds3 <- c(0,0,0,0,0,0,1,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#8
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#7
 
 ds4 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#56
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#55
 
 ds5 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,1,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0, 
+         0,0,0,0,0,0,0,1,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0, 
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#39
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#38
 
-ds6 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,1,
+ds6 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0, 
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#30
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#29
 
 ds7 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0, 
+         0,0,0,0,0,0,0,0,0,0,   1,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0, 
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#42
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#41
 
 ds8 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0, 
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0, 
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#49
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#48
 
 d_s1 <- ts(ds1, start = c(2024, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 d_s2 <- ts(ds2, start = c(2024, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
@@ -561,11 +594,11 @@ d_s6 <- ts(ds6, start = c(2024, isoweek(min(promedio_por_semana$Semana))), frequ
 d_s7 <- ts(ds7, start = c(2024, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 d_s8 <- ts(ds8, start = c(2024, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 
-exogen <- ts.intersect(d_s1,d_s2,d_s3,d_s4,d_s5,d_s6,d_s7,d_s8)
+exogen <- ts.intersect(d_s1,ds2,ds3,ds4,ds5,ds6,ds7,ds8)
  
 exogen1 <-window(exogen, start = c(2024, isoweek(min(promedio_por_semana$Semana))),
-                 end=c(2026, 30))
-exogen2<-window(exogen, start = c(2026, 31))
+                 end=c(2026, 31))
+exogen2<-window(exogen, start = c(2026, 32))
 
 exogen2 <- matrix(0, nrow = 14, ncol = 1)
 
@@ -593,8 +626,8 @@ pronostico <- forecast(modelo1,
 pronostico2026 <- data.frame(pronostico)
 
 pronostico2026 <- pronostico2026 %>% 
-  mutate(Fecha = c("23/AGOST/2026","30/AGOST/2026",
-                   "06/SEPT/2026","13/SEPT/2026","20/SEPT/2026","27/SEPT/2026")) %>% 
+  mutate(Fecha = c("30/AGOST/2026",
+                   "06/SEPT/2026","13/SEPT/2026","20/SEPT/2026","27/SEPT/2026","04/OCTB/2026")) %>% 
   select(Fecha, everything())
 
 pronostico2026$Point.Forecast <- round(pronostico2026$Point.Forecast,2)
@@ -627,7 +660,7 @@ kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
 
 ### Gráfica
 ```{r, fig.width=10, fig.height=6}
-fechas_labels <- c("23 Agosto 26","30 Agosto 26","06 Septiembre 26","13 Septiembre 26","20 Septiembre 26","27 Septiembre 26")
+fechas_labels <- c("30 Agosto 26","06 Septiembre 26","13 Septiembre 26","20 Septiembre 26","27 Septiembre 26","04 Octubre 26")
 tiempos_x <- as.numeric(time(pronostico$mean))
 
 autoplot(pronostico) +
@@ -638,7 +671,7 @@ autoplot(pronostico) +
   geom_hline(yintercept = pronostico2026$Hi.95[1], linetype = "dashed",
              color = "red", size = 1.1) +
 scale_x_continuous(breaks = tiempos_x, labels = fechas_labels) +
-  coord_cartesian(xlim=c(2026.1,2026.66), ylim=c(8.4,14.7)) +
+  coord_cartesian(xlim=c(2026.1,2026.67), ylim=c(8.5,14.5)) +
   labs(title = "Proyección del promedio semanal (Bs) del Dólar Blue",
     subtitle = "Agosto 2026", y = "Promedio Bs", x = "")  + theme_minimal() +
   theme(plot.background = element_rect(fill = "#0d1117", color = NA),
@@ -659,30 +692,30 @@ scale_x_continuous(breaks = tiempos_x, labels = fechas_labels) +
 
 ### LUNES
 ```{r}
-dias <- c("lunes.20.jul","lunes.27.jul","lunes.03.agost","lunes.10.agost",
-          "martes.21.jul","martes.28.jul","martes.04.agost","martes.11.agost",
-          "miercoles.22.jul","miercoles.29.jul","miercoles.05.agost","miercoles.12.agost",
-          "jueves.23.jul","jueves.30.jul","jueves.06.agost","jueves.13.agost",
-          "viernes.24.jul","viernes.31.jul","viernes.07.agost","viernes.14.agost",
-          "sabado.25.jul","sabado.01.agost","sabado.08.agost","sabado.15.agost",
-          "domingo.26.jul","domingo.02.agost","domingo.09.agost","domingo.16.agost")
-fechas <- c("2026-07-20","2026-07-27","2026-08-03","2026-08-10",
-            "2026-07-21","2026-07-28","2026-08-04","2026-08-11",
-            "2026-07-22","2026-07-29","2026-08-05","2026-08-12",
-            "2026-07-23","2026-07-30","2026-08-06","2026-08-13",
-            "2026-07-24","2026-07-31","2026-08-07","2026-08-14",
-            "2026-07-25","2026-08-01","2026-08-08","2026-08-15",
-            "2026-07-26","2026-08-02","2026-08-09","2026-08-16")
+dias <- c("lunes.27.jul","lunes.03.agost","lunes.10.agost","lunes.17.agost",
+          "martes.28.jul","martes.04.agost","martes.11.agost","martes.18.agost",
+          "miercoles.29.jul","miercoles.05.agost","miercoles.12.agost","miercoles.19.agost",
+          "jueves.30.jul","jueves.06.agost","jueves.13.agost","jueves.20.agost",
+          "viernes.31.jul","viernes.07.agost","viernes.14.agost","viernes.21.agost",
+          "sabado.01.agost","sabado.08.agost","sabado.15.agost","sabado.22.agost",
+          "domingo.02.agost","domingo.09.agost","domingo.16.agost","domingo.23.agost")
+fechas <- c("2026-07-27","2026-08-03","2026-08-10","2026-08-17",
+            "2026-07-28","2026-08-04","2026-08-11","2026-08-18",
+            "2026-07-29","2026-08-05","2026-08-12","2026-08-19",
+            "2026-07-30","2026-08-06","2026-08-13","2026-08-20",
+            "2026-07-31","2026-08-07","2026-08-14","2026-08-21",
+            "2026-08-01","2026-08-08","2026-08-15","2026-08-22",
+            "2026-08-02","2026-08-09","2026-08-16","2026-08-23")
 
 for (i in 1:length(dias)) {assign(dias[i], df %>% 
                                     filter(format(fecha, "%Y-%m-%d") == fechas[i]))}
 
-dias <- list(lunes.20.jul,lunes.27.jul,lunes.03.agost,lunes.10.agost)
-dias_nombres <- c("Lunes 20 Julio","Lunes 27 Julio", "Lunes 03 Agosto","Lunes 10 Agosto")
+dias <- list(lunes.27.jul,lunes.03.agost,lunes.10.agost,lunes.17.agost)
+dias_nombres <- c("Lunes 27 Julio", "Lunes 03 Agosto","Lunes 10 Agosto","Lunes 17 Agosto")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-08-10", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-08-17", format(df_semana$fecha, "%H:%M:%S")))
 library(ggthemes)
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -710,12 +743,12 @@ data_lunes <- df_semana
 ### MARTES
 
 ```{r}
-dias <- list(martes.21.jul,martes.28.jul,martes.04.agost,martes.11.agost)
-dias_nombres <- c("Martes 21 Julio","Martes 28 Julio","Martes 04 Agosto","Martes 11 Agosto")
+dias <- list(martes.28.jul,martes.04.agost,martes.11.agost,martes.18.agost)
+dias_nombres <- c("Martes 28 Julio","Martes 04 Agosto","Martes 11 Agosto","Martes 18 Agosto")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-08-11", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-08-18", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -744,12 +777,12 @@ data_martes <- df_semana
 ### MIERCOLES
 
 ```{r}
-dias <- list(miercoles.22.jul,miercoles.29.jul,miercoles.05.agost,miercoles.12.agost)
-dias_nombres <- c("Miercoles 22 Julio","Miercoles 29 Julio","Miercoles 05 Agosto","Miercoles 12 Agosto")
+dias <- list(miercoles.29.jul,miercoles.05.agost,miercoles.12.agost,miercoles.19.agost)
+dias_nombres <- c("Miercoles 29 Julio","Miercoles 05 Agosto","Miercoles 12 Agosto","Miercoles 19 Agosto")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-08-12", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-08-19", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -777,12 +810,12 @@ data_miercoles <- df_semana
 ### JUEVES 
 
 ```{r}
-dias <- list(jueves.23.jul,jueves.30.jul,jueves.06.agost,jueves.13.agost)
-dias_nombres <- c("Jueves 23 Julio","Jueves 30 Julio","Jueves 06 Agosto","Jueves 13 Agosto")
+dias <- list(jueves.30.jul,jueves.06.agost,jueves.13.agost,jueves.20.agost)
+dias_nombres <- c("Jueves 30 Julio","Jueves 06 Agosto","Jueves 13 Agosto","Jueves 20 Agosto")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-08-13", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-08-20", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -810,12 +843,12 @@ data_jueves <- df_semana
 ### VIERNES
 
 ```{r}
-dias <- list(viernes.24.jul,viernes.31.jul,viernes.07.agost,viernes.14.agost)
-dias_nombres <- c("Viernes 24 Julio","Viernes 31 Julio","Viernes 07 Agosto","Viernes 14 Agosto")
+dias <- list(viernes.31.jul,viernes.07.agost,viernes.14.agost,viernes.21.agost)
+dias_nombres <- c("Viernes 31 Julio","Viernes 07 Agosto","Viernes 14 Agosto","Viernes 21 Agosto")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-08-14", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-08-21", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -843,12 +876,12 @@ data_viernes <- df_semana
 ### SABADO
 
 ```{r}
-dias <- list(sabado.25.jul,sabado.01.agost,sabado.08.agost,sabado.15.agost)
-dias_nombres <- c("Sabado 25 Julio","Sabado 01 Agosto","Sabado 08 Agosto","Sabado 15 Agosto")
+dias <- list(sabado.01.agost,sabado.08.agost,sabado.15.agost,sabado.22.agost)
+dias_nombres <- c("Sabado 01 Agosto","Sabado 08 Agosto","Sabado 15 Agosto","Sabado 22 Agosto")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-08-15", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-08-22", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -876,12 +909,12 @@ data_sabado <- df_semana
 ### DOMINGO
 
 ```{r}
-dias <- list(domingo.26.jul,domingo.02.agost,domingo.09.agost,domingo.16.agost)
-dias_nombres <- c("Domingo 26 Julio","Domingo 02 Agosto","Domingo 09 Agosto","Domingo 16 Agosto")
+dias <- list(domingo.02.agost,domingo.09.agost,domingo.16.agost,domingo.23.agost)
+dias_nombres <- c("Domingo 02 Agosto","Domingo 09 Agosto","Domingo 16 Agosto","Domingo 23 Agosto")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-08-16", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-08-23", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -1116,14 +1149,19 @@ El valor referencial del dólar estadounidense para operaciones con el exterior 
 ```{r}
 library(jsonlite)
 library(httr)
+library(rvest)   # <--- Necesario para leer el HTML de la web
+library(dplyr)
+library(tidyr)
+library(zoo)
+library(knitr)
+library(kableExtra)
 
 fetch_usdtbol_fixed <- function(api_id, col_name) {
   url <- paste0("https://usdtbol.com/api/", api_id)
   
-  # Incluimos obligatoriamente el parámetro callback = "cb"
   res <- GET(
     url, 
-    query = list(callback = "cb"),
+    query = list(callback = "cb", t = format(Sys.time(), "%s")), # Cache-buster por si acaso
     add_headers(
       "User-Agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
       "Referer"    = "https://usdtbol.com/"
@@ -1132,30 +1170,33 @@ fetch_usdtbol_fixed <- function(api_id, col_name) {
   
   raw <- content(res, "text", encoding = "UTF-8")
   
-  # Si el servidor responde "-1", avisar claramente
   if (trimws(raw) == "-1") {
     stop(paste("El endpoint", api_id, "devolvió -1. Verifica que el ID del endpoint sea correcto."))
   }
   
-  # Limpiar el envoltorio cb(...) -> deja solo el JSON
-  # Remueve 'cb(' del inicio y ')' o ');' del final
-  json_clean <- sub("^^[a-zA-Z0-9_$]+\\((.*)\\);?$", "\\1", raw)
-  # Parsear JSON
+  json_clean <- sub("^[a-zA-Z0-9_$]+\\((.*)\\);?$", "\\1", raw)
   data <- fromJSON(json_clean)
   
+  t_val <- if (!is.null(data$times) && max(data$times, na.rm = TRUE) > 1e12) data$times / 1000 else data$times
+  
   df <- data.frame(
-    fecha = as.POSIXct(data$times, origin = "1970-01-01"),
-    precio = data$list
+    fecha = as.POSIXct(t_val, origin = "1970-01-01", tz = "UTC"),
+    precio = as.numeric(data$list)
   )
   
   colnames(df)[2] <- col_name
   return(df)
 }
 
-# Probamos con las dos series
-#df_serie1 <- fetch_usdtbol_fixed("41j11x65l36h", "paralelo")
+# 1. Obtenemos la serie histórica de la API
 databcb <- fetch_usdtbol_fixed("d5s4yr95l36h", "serie_d5s")
 
+# 2. Extraemos el valor real y actualizado directamente del HTML de la web
+webpage <- read_html("https://usdtbol.com/")
+tco_texto <- webpage %>% html_node(".bcb-tco-num") %>% html_text(trim = TRUE)
+precio_real <- as.numeric(gsub(",", ".", tco_texto))
+
+# 3. Procesamos las fechas del histórico
 databcb <- databcb %>%
   mutate(fecha = as.Date(fecha)) %>%
   complete(fecha = seq(min(fecha), max(fecha), by = "day")) %>%
@@ -1163,7 +1204,15 @@ databcb <- databcb %>%
 
 databcb$serie_d5s <- na.approx(databcb$serie_d5s, method = "linear")
 
-# Join por fecha para evitar desfase de longitud por timezone en df_dia$Dia (POSIXct)
+# 4. Forzamos/actualizamos el último registro con el precio real de la web
+hoy <- Sys.Date()
+if (max(databcb$fecha) < hoy) {
+  databcb <- bind_rows(databcb, data.frame(fecha = hoy, serie_d5s = precio_real))
+} else {
+  databcb$serie_d5s[nrow(databcb)] <- precio_real
+}
+
+# 5. Continuamos con tu lógica de cruce y cálculo de brechas
 df_dia_filtrado <- df_dia %>%
   mutate(fecha = as.Date(Dia)) %>%
   filter(fecha >= as.Date(min(databcb$fecha, na.rm = TRUE)), 
@@ -1173,11 +1222,11 @@ df_dia_filtrado <- df_dia %>%
 databcb <- databcb %>%
   left_join(df_dia_filtrado, by = "fecha")
 
-databcb <- databcb |> 
+databcb <- databcb |>  
   rename(usd_bcb = serie_d5s)
 
-databcb <- databcb |> 
-  transform(usd_bcb = round(usd_bcb,2))
+databcb <- databcb |>  
+  transform(usd_bcb = round(usd_bcb, 2))
 
 databcb$Brecha <- abs(databcb$usd_bcb - databcb$usdt)
 
@@ -1188,13 +1237,14 @@ databcb <- databcb %>%
       Brecha >= 1.00 ~ "Alta",
       Brecha >= 0.50 ~ "Moderada",
       Brecha >= 0.20 ~ "Baja",
-      TRUE           ~ "Muy Baja / Mínima" # Para valores menores a 0.20
+      TRUE            ~ "Muy Baja / Mínima"
     ))
 
-databcb$Brecha <- round(databcb$Brecha,2)
+databcb$Brecha <- round(databcb$Brecha, 2)
 
-kable(databcb, caption = "Información del BCB y Binance", align = c("l", "c", "c", "c","c"))%>%
-kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+# 6. Renderizamos la tabla final
+kable(databcb, caption = "Información del BCB y Binance", align = c("l", "c", "c", "c", "c")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
                 full_width = FALSE, font_size = 13) %>%
   kable_minimal()
 
@@ -2072,18 +2122,18 @@ ds10_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0
           start = c(2025, 6), frequency = 52) #43
 
 
-exogen_mie <- cbind(ds1_mie,ds2_mie,ds3_mie,ds4_mie,ds5_mie,ds6_mie)
+exogen_mie <- cbind(ds1_mie,ds2_mie)
 exogen1_mie <- head(exogen_mie, length(ts_semana_miercoles))
 
 modelo1_mie <- Arima(ts_semana_miercoles, order = c(0, 1, 0), xreg = as.matrix(exogen1_mie), include.mean = TRUE)
-
+ 
 # summary(modelo1_mie)
 # resid01 <- modelo1_mie$residuals
 # jarque.bera.test(resid01)
 # shapiro.test(resid01)
 # Box.test(resid01, type="Ljung-Box")
 
-exogen2_mie <- matrix(0, nrow = 4, ncol = 6)
+exogen2_mie <- matrix(0, nrow = 4, ncol = 2)
 pronostico_mie <- forecast(modelo1_mie, h = 4, level = c(20, 30, 40, 50, 60, 70, 80, 90, 95), xreg = exogen2_mie)
 pronostico_miercoles <- pronostico_mie$mean[1]
 
@@ -2092,7 +2142,7 @@ pronostico_miercoles <- pronostico_mie$mean[1]
 # JUEVES
 # ==============================================================================
 df_jueves <- df_dia %>% filter(Detalle == "Jueves")
-ts_semana_jueves <- ts(df_jueves$Promedio, start = c(2025, 10), frequency = 52)
+ts_semana_jueves <- ts(df_jueves$Promedio, start = c(2025, 11), frequency = 52)
 
 modelo_jueves <- auto.arima(ts_semana_jueves)
 # summary(modelo_jueves)
@@ -2102,56 +2152,56 @@ modelo_jueves <- auto.arima(ts_semana_jueves)
 # sort(-abs(myboxplot1$out))
 # modelo_jueves$residuals
 
-ds1_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds1_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,1,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 10), frequency = 52) #15
-ds2_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,1,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 11), frequency = 52) #14
+ds2_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 10), frequency = 52) #20
-ds3_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 11), frequency = 52) #19
+ds3_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,1,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 10), frequency = 52) #18
+          start = c(2025, 11), frequency = 52) #17
 ds4_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 10), frequency = 52) #33
-ds5_jue <- ts(c(0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 10), frequency = 52) #6
-ds6_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 11), frequency = 52) #32
+ds5_jue <- ts(c(0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 10), frequency = 52) #13
-ds7_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,1,0,0,0,0,0,0,
+          start = c(2025, 11), frequency = 52) #5
+ds6_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 10), frequency = 52) #24
+          start = c(2025, 11), frequency = 52) #12
+ds7_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,1,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+          start = c(2025, 11), frequency = 52) #23
 ds8_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 10), frequency = 52) #39
+          start = c(2025, 11), frequency = 52) #38
 ds9_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,1,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 10), frequency = 52) #70
-ds10_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,1,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 11), frequency = 52) #69
+ds10_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 10), frequency = 52) #17
+          start = c(2025, 11), frequency = 52) #16
 
 exogen_jue <- cbind(ds1_jue,ds2_jue)
 exogen1_jue <- head(exogen_jue, length(ts_semana_jueves))
@@ -2394,7 +2444,7 @@ ds9_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,
           start = c(2025, 12), frequency = 52) #16
 
 
-exogen_dom <- cbind(ds1_dom,ds2_dom,ds3_dom,ds4_dom)
+exogen_dom <- cbind(ds1_dom,ds2_dom,ds3_dom)
 exogen1_dom <- head(exogen_dom, length(ts_semana_domingo))
 
 modelo1_dom <- Arima(ts_semana_domingo, order = c(0, 1, 0), xreg = as.matrix(exogen1_dom), include.mean = TRUE)
@@ -2405,15 +2455,15 @@ modelo1_dom <- Arima(ts_semana_domingo, order = c(0, 1, 0), xreg = as.matrix(exo
 # shapiro.test(resid01)
 # Box.test(resid01, type="Ljung-Box")
  
-exogen2_dom <- matrix(0, nrow = 4, ncol = 4)
+exogen2_dom <- matrix(0, nrow = 4, ncol = 3)
 pronostico_dom <- forecast(modelo1_dom, h = 4, level = c(20, 30, 40, 50, 60, 70, 80, 90, 95), xreg = exogen2_dom)
 pronostico_domingo <- pronostico_dom$mean[1]
 
 
 library(ggplot2)
 
-x <- c("Lunes 17 Agosto","Martes 18 Agosto","Miercoles 19 Agosto","Jueves 20 Agosto",
-       "Viernes 21 Agosto","Sabado 22 Agosto","Domingo 23 Agosto")
+x <- c("Lunes 24 Agosto","Martes 25 Agosto","Miercoles 26 Agosto","Jueves 27 Agosto",
+       "Viernes 28 Agosto","Sabado 29 Agosto","Domingo 30 Agosto")
 # Tu vector de referencia
 y <- c(pronostico_lunes,pronostico_martes,pronostico_miercoles,pronostico_jueves,
        pronostico_viernes,pronostico_sabado,pronostico_domingo)# original
