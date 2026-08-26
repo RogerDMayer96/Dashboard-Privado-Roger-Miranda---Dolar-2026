@@ -6,6 +6,7 @@ output:
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: fill
+sidebar: true
     theme:
       version: 5
       bg: "#0d1117"
