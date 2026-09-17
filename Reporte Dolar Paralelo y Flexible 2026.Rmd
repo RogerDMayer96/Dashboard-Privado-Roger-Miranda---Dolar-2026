@@ -2050,7 +2050,7 @@ modelo1 <- fit_arima_safe(ts_semana_lunes, order = c(4, 2, 1), xreg = as.matrix(
 # shapiro.test(resid01)
 # Box.test(resid01, type="Ljung-Box")
 
-exogen2 <- matrix(0, nrow = 4, ncol = 3)
+exogen2 <- matrix(0, nrow = 4, ncol = ncol(modelo1$xreg))
 pronostico <- forecast(modelo1, h = 4, level = c(99), xreg = exogen2)
 pronostico_lunes <- pronostico$lower[1]
 
@@ -2140,7 +2140,7 @@ modelo1_mar <- fit_arima_safe(ts_semana_martes, order = c(0, 2, 1), xreg = as.ma
 # shapiro.test(resid01)
 # Box.test(resid01, type="Ljung-Box")
 
-exogen2_mar <- matrix(0, nrow = 4, ncol = 4)
+exogen2_mar <- matrix(0, nrow = 4, ncol = ncol(modelo1_mar$xreg))
 pronostico_mar <- forecast(modelo1_mar, h = 4, level = c(99), xreg = exogen2_mar)
 pronostico_martes <- pronostico_mar$lower[1]
 
@@ -2231,7 +2231,7 @@ modelo1_mie <- fit_arima_safe(ts_semana_miercoles, order = c(0, 2, 1), xreg = as
 # shapiro.test(resid01)
 # Box.test(resid01, type="Ljung-Box")
 
-exogen2_mie <- matrix(0, nrow = 4, ncol = 2)
+exogen2_mie <- matrix(0, nrow = 4, ncol = ncol(modelo1_mie$xreg))
 pronostico_mie <- forecast(modelo1_mie, h = 4, level = c(99), xreg = exogen2_mie)
 pronostico_miercoles <- pronostico_mie$lower[1]
 
@@ -2312,7 +2312,7 @@ modelo1_jue <- fit_arima_safe(ts_semana_jueves, order = c(0, 2, 1), xreg = as.ma
 # shapiro.test(resid01)
 # Box.test(resid01, type="Ljung-Box")
 
-exogen2_jue <- matrix(0, nrow = 4, ncol = 3)
+exogen2_jue <- matrix(0, nrow = 4, ncol = ncol(modelo1_jue$xreg))
 pronostico_jue <- forecast(modelo1_jue, h = 4, level = c(99), xreg = exogen2_jue)
 pronostico_jueves <- pronostico_jue$lower[1]
 
@@ -2402,7 +2402,7 @@ modelo1_vie <- fit_arima_safe(ts_semana_viernes, order = c(1, 2, 1), xreg = as.m
 # shapiro.test(resid01)
 # Box.test(resid01, type="Ljung-Box")
 
-exogen2_vie <- matrix(0, nrow = 4, ncol = 9)
+exogen2_vie <- matrix(0, nrow = 4, ncol = ncol(modelo1_vie$xreg))
 pronostico_vie <- forecast(modelo1_vie, h = 4, level = c(99), xreg = exogen2_vie)
 pronostico_viernes <- pronostico_vie$lower[1]
 
@@ -2474,7 +2474,7 @@ modelo1_sab <- fit_arima_safe(ts_semana_sabado, order = c(3, 2, 1), xreg = as.ma
 # shapiro.test(resid01)
 # Box.test(resid01, type="Ljung-Box")
  
-exogen2_sab <- matrix(0, nrow = 4, ncol = 3)
+exogen2_sab <- matrix(0, nrow = 4, ncol = ncol(modelo1_sab$xreg))
 pronostico_sab <- forecast(modelo1_sab, h = 4, level = c(99), xreg = exogen2_sab)
 pronostico_sabado <- pronostico_sab$lower[1]
 
@@ -2549,7 +2549,7 @@ modelo1_dom <- fit_arima_safe(ts_semana_domingo, order = c(2, 2, 1), xreg = as.m
 # shapiro.test(resid01)
 # Box.test(resid01, type="Ljung-Box")
  
-exogen2_dom <- matrix(0, nrow = 4, ncol = 1)
+exogen2_dom <- matrix(0, nrow = 4, ncol = ncol(modelo1_dom$xreg))
 pronostico_dom <- forecast(modelo1_dom, h = 4, level = c(99), xreg = exogen2_dom)
 pronostico_domingo <- pronostico_dom$lower[1]
 
