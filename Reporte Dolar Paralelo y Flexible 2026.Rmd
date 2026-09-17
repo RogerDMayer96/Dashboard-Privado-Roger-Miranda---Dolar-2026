@@ -93,8 +93,42 @@ fecha_cierre <- floor_date(Sys.Date() - days(1), unit = "week")
 
 library(jsonlite)
 library(httr)
+library(xml2)
 
-res <- GET("https://usdtbol.com/api/41j11x65l36h", query = list(callback = "cb"),
+# ------------------------------------------------------------------------------
+# Wrappers de seguridad para llamadas de red (GET / read_html).
+# NO cambian que datos se piden ni como se procesan despues: solo agregan un
+# timeout explicito y un mensaje claro si la fuente externa no responde, para
+# que el render no se quede colgado indefinidamente en Posit Connect Cloud.
+# ------------------------------------------------------------------------------
+safe_GET <- function(url, ..., timeout_seg = 20) {
+  tryCatch(
+    httr::GET(url, httr::timeout(timeout_seg), ...),
+    error = function(e) {
+      stop("safe_GET: no se pudo conectar con ", url,
+           " dentro de ", timeout_seg, "s (", conditionMessage(e), ")", call. = FALSE)
+    }
+  )
+}
+
+safe_read_html <- function(url, encoding = "UTF-8", timeout_seg = 20,
+                            user_agent = "Mozilla/5.0") {
+  res <- tryCatch(
+    httr::GET(url, httr::timeout(timeout_seg), httr::add_headers("User-Agent" = user_agent)),
+    error = function(e) {
+      stop("safe_read_html: no se pudo conectar con ", url,
+           " dentro de ", timeout_seg, "s (", conditionMessage(e), ")", call. = FALSE)
+    }
+  )
+  if (httr::http_error(res)) {
+    stop("safe_read_html: la respuesta HTTP de ", url,
+         " fue un error (status ", httr::status_code(res), ")", call. = FALSE)
+  }
+  xml2::read_html(httr::content(res, "text", encoding = encoding), encoding = encoding)
+}
+# ------------------------------------------------------------------------------
+
+res <- safe_GET("https://usdtbol.com/api/41j11x65l36h", query = list(callback = "cb"),
   add_headers("User-Agent" = "Mozilla/5.0", "Referer" = "https://usdtbol.com/"))
 raw <- content(res, "text", encoding = "UTF-8")
 
@@ -274,7 +308,7 @@ library(rvest)
 
 # 1. Obtener la serie histórica mediante la API como lo venías haciendo
 fetch_ultimo_bcb <- function(api_id) {
-  res <- GET(paste0("https://usdtbol.com/api/", api_id),
+  res <- safe_GET(paste0("https://usdtbol.com/api/", api_id),
              query = list(callback = "cb", t = format(Sys.time(), "%s")),
              add_headers("User-Agent" = "Mozilla/5.0", "Referer" = "https://usdtbol.com/"))
   raw <- content(res, "text", encoding = "UTF-8")
@@ -292,7 +326,7 @@ fetch_ultimo_bcb <- function(api_id) {
 df_bcb_ultimo <- fetch_ultimo_bcb("d5s4yr95l36h") %>% filter(!is.na(precio))
 
 # 2. Extraer el valor real y actualizado directamente del HTML de la web
-webpage <- read_html("https://usdtbol.com/")
+webpage <- safe_read_html("https://usdtbol.com/")
 tco_texto <- webpage %>% html_node(".bcb-tco-num") %>% html_text(trim = TRUE)
 precio_real <- as.numeric(gsub(",", ".", tco_texto))
 
@@ -1184,7 +1218,7 @@ library(kableExtra)
 fetch_usdtbol_fixed <- function(api_id, col_name) {
   url <- paste0("https://usdtbol.com/api/", api_id)
   
-  res <- GET(
+  res <- safe_GET(
     url, 
     query = list(callback = "cb", t = format(Sys.time(), "%s")), # Cache-buster por si acaso
     add_headers(
@@ -1217,7 +1251,7 @@ fetch_usdtbol_fixed <- function(api_id, col_name) {
 databcb <- fetch_usdtbol_fixed("d5s4yr95l36h", "serie_d5s")
 
 # 2. Extraemos el valor real y actualizado directamente del HTML de la web
-webpage <- read_html("https://usdtbol.com/")
+webpage <- safe_read_html("https://usdtbol.com/")
 tco_texto <- webpage %>% html_node(".bcb-tco-num") %>% html_text(trim = TRUE)
 precio_real <- as.numeric(gsub(",", ".", tco_texto))
 
@@ -1428,7 +1462,7 @@ library(tidyr)
 url_tabla <- "https://www.bcb.gob.bo/bcb_tco_publico_evolutivo.php"   # <-- URL corregida
 
 # --- 1. Descargar y parsear el HTML -----------------------------------
-pagina <- read_html(url_tabla)
+pagina <- safe_read_html(url_tabla)
 
 # --- 2. Ubicar la tabla (clase "bcb-table") ----------------------------
 tabla_nodo <- pagina |> html_element("table.bcb-table")
@@ -1526,7 +1560,7 @@ heatmaply(
 ```{r}
 
 # --- 1. Descargar y parsear el HTML -------------------------------------
-pagina <- read_html(url_tabla)
+pagina <- safe_read_html(url_tabla)
 
 # --- 2. Funcion generica: extraer una tabla bcb-table por su titulo -----
 extraer_tabla_bcb <- function(pagina, texto_titulo) {
@@ -1702,7 +1736,7 @@ url_tabla <- "https://www.bcb.gob.bo/bcb_tco_publico_evolutivo.php"
 
 # --- 1. Descargar y parsear el HTML -------------------------------------
 # Se fuerza encoding UTF-8 explicitamente para evitar problemas con tildes
-pagina <- read_html(url_tabla, encoding = "UTF-8")
+pagina <- safe_read_html(url_tabla, encoding = "UTF-8")
 
 # --- 2. Funcion generica: extraer una tabla bcb-table por su titulo -----
 # La comparacion se hace SIN tildes/acentos para evitar fallos por
