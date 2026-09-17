@@ -619,13 +619,13 @@ d_s6 <- ts(ds6, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequ
 d_s7 <- ts(ds7, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 # d_s8 <- ts(ds8, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 
-exogen <- ts.intersect(d_s1)
+exogen <- ts.intersect(d_s1,d_s2)
  
 exogen1 <-window(exogen, start = c(2025, isoweek(min(promedio_por_semana$Semana))),
                  end=c(2026, 37))
 exogen2<-window(exogen, start = c(2026, 38))
 
-exogen2 <- matrix(0, nrow = 14, ncol = 1)
+exogen2 <- matrix(0, nrow = 14, ncol = 4)
 
 modelo1 <- Arima(ts_semana,
                  order = c(2,2,1),
@@ -642,7 +642,7 @@ Box.test(resid02, type="Ljung-Box")
 ## Column 2
 ### Tabla
 ```{r}
-exogen2 <- matrix(0, nrow = 6, ncol = 1)
+exogen2 <- matrix(0, nrow = 6, ncol = 2)
 
 pronostico <- forecast(modelo1,
                        h = 6, level = c(20,30,40,50,60,70,80,90,95),
@@ -1891,6 +1891,46 @@ library(dplyr)
 library(lubridate)
 library(forecast)
 
+# ------------------------------------------------------------------------------
+# Wrapper de seguridad para Arima(): NO cambia la metodologia (mismos order/xreg).
+# Solo evita que el reporte entero se caiga si, por datos nuevos del scraping,
+# alguna dummy de intervencion quedo en todo-ceros (columna sin varianza) o si
+# optim() no logra converger. En el caso normal (todo bien) el resultado es
+# identico a llamar Arima() directamente.
+# ------------------------------------------------------------------------------
+fit_arima_safe <- function(y, order, xreg = NULL, include.mean = TRUE, ...) {
+  xreg_ok <- xreg
+  if (!is.null(xreg_ok)) {
+    xreg_ok <- as.matrix(xreg_ok)
+    # Descarta columnas sin varianza (dummies que quedaron en 0 por truncamiento)
+    keep <- apply(xreg_ok, 2, function(col) stats::sd(col, na.rm = TRUE) > 0)
+    if (!all(keep)) {
+      message("fit_arima_safe: se omiten columnas de xreg sin varianza -> ",
+              paste(colnames(xreg_ok)[!keep], collapse = ", "))
+    }
+    xreg_ok <- xreg_ok[, keep, drop = FALSE]
+    if (ncol(xreg_ok) == 0) xreg_ok <- NULL
+  }
+
+  modelo <- tryCatch(
+    forecast::Arima(y, order = order, xreg = xreg_ok, include.mean = include.mean, ...),
+    error = function(e) {
+      message("fit_arima_safe: Arima() fallo (", conditionMessage(e),
+              "). Usando auto.arima() como respaldo.")
+      tryCatch(
+        forecast::auto.arima(y, xreg = xreg_ok),
+        error = function(e2) {
+          message("fit_arima_safe: auto.arima() tambien fallo (", conditionMessage(e2),
+                   "). Usando auto.arima() sin xreg.")
+          forecast::auto.arima(y)
+        }
+      )
+    }
+  )
+  modelo
+}
+# ------------------------------------------------------------------------------
+
 # 1. Filtro inicial y días de la semana
 df_dia <- df_dia %>%
   mutate(Detalle = case_when(
@@ -1968,7 +2008,7 @@ ds6 <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,
 exogen_lunes <- cbind(ds1,ds2,ds3)
 exogen1 <- head(exogen_lunes, length(ts_semana_lunes))
 
-modelo1 <- Arima(ts_semana_lunes, order = c(4, 2, 1), xreg = as.matrix(exogen1), include.mean = TRUE)
+modelo1 <- fit_arima_safe(ts_semana_lunes, order = c(4, 2, 1), xreg = as.matrix(exogen1), include.mean = TRUE)
 
 # summary(modelo1)
 # resid01 <- modelo1$residuals
@@ -2058,7 +2098,7 @@ ds5_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,
 exogen_mar <- cbind(ds1_mar,ds2_mar,ds3_mar,ds4_mar)
 exogen1_mar <- head(exogen_mar, length(ts_semana_martes))
 
-modelo1_mar <- Arima(ts_semana_martes, order = c(0, 2, 1), xreg = as.matrix(exogen1_mar), include.mean = TRUE)
+modelo1_mar <- fit_arima_safe(ts_semana_martes, order = c(0, 2, 1), xreg = as.matrix(exogen1_mar), include.mean = TRUE)
 
 # summary(modelo1_mar)
 # resid01 <- modelo1_mar$residuals
@@ -2149,7 +2189,7 @@ ds5_mie <- ts(c(0,0,0,0,0,0,1,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,
 exogen_mie <- cbind(ds1_mie,ds2_mie)
 exogen1_mie <- head(exogen_mie, length(ts_semana_miercoles))
 
-modelo1_mie <- Arima(ts_semana_miercoles, order = c(0, 2, 1), xreg = as.matrix(exogen1_mie), include.mean = TRUE)
+modelo1_mie <- fit_arima_safe(ts_semana_miercoles, order = c(0, 2, 1), xreg = as.matrix(exogen1_mie), include.mean = TRUE)
  
 # summary(modelo1_mie)
 # resid01 <- modelo1_mie$residuals
@@ -2230,7 +2270,7 @@ ds7_jue <- ts(c(0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,
 exogen_jue <- cbind(ds1_jue,ds2_jue,ds3_jue)
 exogen1_jue <- head(exogen_jue, length(ts_semana_jueves))
 
-modelo1_jue <- Arima(ts_semana_jueves, order = c(0, 2, 1), xreg = as.matrix(exogen1_jue), include.mean = TRUE)
+modelo1_jue <- fit_arima_safe(ts_semana_jueves, order = c(0, 2, 1), xreg = as.matrix(exogen1_jue), include.mean = TRUE)
 
 # summary(modelo1_jue)
 # resid01 <- modelo1_jue$residuals
@@ -2246,7 +2286,7 @@ pronostico_jueves <- pronostico_jue$lower[1]
 # VIERNES
 # ==============================================================================
 df_viernes <- df_dia %>% filter(Detalle == "Viernes")
-ts_semana_viernes <- ts(df_viernes$Promedio, start = c(2025, 33), frequency = 52)
+ts_semana_viernes <- ts(df_viernes$Promedio, start = c(2025, 34), frequency = 52)
 
 modelo_viernes <- auto.arima(ts_semana_viernes)
 # summary(modelo_viernes)
@@ -2257,70 +2297,70 @@ modelo_viernes <- auto.arima(ts_semana_viernes)
 # modelo_viernes$residuals
 
 ds1_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,1,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 33), frequency = 52) #57
+          start = c(2025, 34), frequency = 52) #56
 
-ds2_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
+ds2_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 33), frequency = 52) #19
+          start = c(2025, 34), frequency = 52) #11
 
-ds3_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds3_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 33), frequency = 52) #12
+          start = c(2025, 34), frequency = 52) #18
 
 ds4_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,1,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 33), frequency = 52) #50
+          start = c(2025, 34), frequency = 52) #49
 
 ds5_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 33), frequency = 52) #52
+          start = c(2025, 34), frequency = 52) #51
 
-ds6_vie <- ts(c(0,0,0,0,0,0,1,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 33), frequency = 52) #7
-
-ds7_vie <- ts(c(0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds6_vie <- ts(c(0,0,0,1,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 33), frequency = 52) #5
+          start = c(2025, 34), frequency = 52) #4
 
-ds8_vie <- ts(c(0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds7_vie <- ts(c(0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 33), frequency = 52) #3
+          start = c(2025, 34), frequency = 52) #6
 
-ds9_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds8_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,1,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 33), frequency = 52) #48
+          start = c(2025, 34), frequency = 52) #47
 
-ds10_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds9_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 33), frequency = 52) #13
+          start = c(2025, 34), frequency = 52) #12
+
+# ds10_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+#           start = c(2025, 33), frequency = 52) #13
 
 
-exogen_vie <- cbind(ds1_vie,ds2_vie,ds3_vie,ds4_vie,ds5_vie,ds6_vie,ds7_vie,ds8_vie,ds9_vie,ds10_vie)
+exogen_vie <- cbind(ds1_vie,ds2_vie,ds3_vie,ds4_vie,ds5_vie,ds6_vie,ds7_vie,ds8_vie,ds9_vie)
 exogen1_vie <- head(exogen_vie, length(ts_semana_viernes))
 
-modelo1_vie <- Arima(ts_semana_viernes, order = c(0, 2, 1), xreg = as.matrix(exogen1_vie), include.mean = TRUE)
+modelo1_vie <- fit_arima_safe(ts_semana_viernes, order = c(1, 2, 1), xreg = as.matrix(exogen1_vie), include.mean = TRUE)
 
 # summary(modelo1_vie)
 # resid01 <- modelo1_vie$residuals
@@ -2328,7 +2368,7 @@ modelo1_vie <- Arima(ts_semana_viernes, order = c(0, 2, 1), xreg = as.matrix(exo
 # shapiro.test(resid01)
 # Box.test(resid01, type="Ljung-Box")
 
-exogen2_vie <- matrix(0, nrow = 4, ncol = 10)
+exogen2_vie <- matrix(0, nrow = 4, ncol = 9)
 pronostico_vie <- forecast(modelo1_vie, h = 4, level = c(99), xreg = exogen2_vie)
 pronostico_viernes <- pronostico_vie$lower[1]
 
@@ -2392,7 +2432,7 @@ ds4_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,
 exogen_sab <- cbind(ds1_sab,ds2_sab,ds3_sab)
 exogen1_sab <- head(exogen_sab, length(ts_semana_sabado))
 
-modelo1_sab <- Arima(ts_semana_sabado, order = c(3, 2, 1), xreg = as.matrix(exogen1_sab), include.mean = TRUE)
+modelo1_sab <- fit_arima_safe(ts_semana_sabado, order = c(3, 2, 1), xreg = as.matrix(exogen1_sab), include.mean = TRUE)
  
 # summary(modelo1_sab)
 # resid01 <- modelo1_sab$residuals
@@ -2467,7 +2507,7 @@ ds6_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,1,0,0,0,0,0,0,     0,0,0,0,0,0,0,
 exogen_dom <- cbind(ds1_dom)
 exogen1_dom <- head(exogen_dom, length(ts_semana_domingo))
 
-modelo1_dom <- Arima(ts_semana_domingo, order = c(2, 2, 1), xreg = as.matrix(exogen1_dom), include.mean = TRUE)
+modelo1_dom <- fit_arima_safe(ts_semana_domingo, order = c(2, 2, 1), xreg = as.matrix(exogen1_dom), include.mean = TRUE)
 
 # summary(modelo1_dom)
 # resid01 <- modelo1_dom$residuals
