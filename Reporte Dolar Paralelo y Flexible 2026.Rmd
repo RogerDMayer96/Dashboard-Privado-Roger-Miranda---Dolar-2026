@@ -1991,9 +1991,9 @@ modelo_lunes <- auto.arima(ts_semana_lunes)
 # summary(modelo_lunes)
 # resid01 <- modelo_lunes$residuals
 
-myboxplot1 <- boxplot(modelo_lunes$residuals)
-sort(-abs(myboxplot1$out))
-modelo_lunes$residuals
+# myboxplot1 <- boxplot(modelo_lunes$residuals)
+# sort(-abs(myboxplot1$out))
+# modelo_lunes$residuals
 
 ds1 <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,
             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
