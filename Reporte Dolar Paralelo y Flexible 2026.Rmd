@@ -177,6 +177,9 @@ df_final <- bind_rows(df_usdt, df_blue_relleno) %>%
 
 df <- df_final
 
+df <- df |> 
+  filter(precio>0)
+
 library(plotly)
 library(htmlwidgets)
 library(tseries)
@@ -632,7 +635,7 @@ promedio_por_semana <- promedio_por_semana |>
   filter(as.Date(Semana) <= as.Date(fecha_cierre))
 
 # eliminacion de outliers 
-promedio_por_semana <- promedio_por_semana %>% slice(-(1:26))
+promedio_por_semana <- promedio_por_semana %>% slice(-(1:40))
 
 ts_semana <- ts(promedio_por_semana$Promedio, 
                 start = c(2025, isoweek(min(promedio_por_semana$Semana))), 
@@ -651,55 +654,55 @@ ts_semana <- ts(promedio_por_semana$Promedio,
 # modelo$residuals
 
 # Creamos variables de impulso 
-ds1 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,1,0,0,0,    0,0,0,0,0,0,0,0,0,0,
+ds1 <- c(0,0,0,0,1,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#17
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#5
  
-ds2 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,1,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
+ds2 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,1,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#15
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#20
 
 ds3 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,1,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#88
+         0,0,0,0,1,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#65
 
-ds4 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds4 <- c(0,0,1,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#79
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#3
 
 ds5 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#42
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,1,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#74
 
-ds6 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,1,0,0,0,0,0,0,
+ds6 <- c(0,0,0,0,0,0,0,0,0,1,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#24
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#10
 
-ds7 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,1,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds7 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#33
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#28
 
-ds8 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,1,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#34
-
-ds9 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#19
-
-ds10 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#26
+# ds8 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#          0,0,0,1,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#34
+# 
+# ds9 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
+#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#19
+# 
+# ds10 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,
+#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#26
 
 d_s1 <- ts(ds1, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 d_s2 <- ts(ds2, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
@@ -708,20 +711,20 @@ d_s4 <- ts(ds4, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequ
 d_s5 <- ts(ds5, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 d_s6 <- ts(ds6, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 d_s7 <- ts(ds7, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
-d_s8 <- ts(ds8, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
-d_s9 <- ts(ds7, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
-d_s10 <- ts(ds8, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
+# d_s8 <- ts(ds8, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
+# d_s9 <- ts(ds7, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
+# d_s10 <- ts(ds8, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 
-exogen <- ts.intersect(d_s1,d_s2,d_s3,d_s4,d_s5,d_s6,d_s7)
+exogen <- ts.intersect(d_s1,d_s2)
  
 exogen1 <-window(exogen, start = c(2025, isoweek(min(promedio_por_semana$Semana))),
-                 end=c(2026, 38))
-exogen2<-window(exogen, start = c(2026, 39))
+                 end=c(2026, 39))
+exogen2<-window(exogen, start = c(2026, 40))
 
 exogen2 <- matrix(0, nrow = 14, ncol = 1)
 
 modelo1 <- Arima(ts_semana,
-                 order = c(1,1,1),
+                 order = c(3,2,2),
                 xreg = as.matrix(exogen1),
                  include.mean = TRUE)
 summary(modelo1)
@@ -735,7 +738,7 @@ Box.test(resid02, type="Ljung-Box")
 ## Column 2
 ### Tabla
 ```{r}
-exogen2 <- matrix(0, nrow = 6, ncol = 7)
+exogen2 <- matrix(0, nrow = 6, ncol = 2)
 
 pronostico <- forecast(modelo1,
                        h = 6, level = c(20,30,40,50,60,70,80,90,95),
@@ -744,8 +747,9 @@ pronostico <- forecast(modelo1,
 pronostico2026 <- data.frame(pronostico)
 
 pronostico2026 <- pronostico2026 %>% 
-  mutate(Fecha = c("27/SEPT/2026","04/OCTB/2026",
-                   "11/OCTB/2026","18/OCTB/2026","25/OCTB/2026","01/NOV/2026")) %>% 
+  mutate(Fecha = c("04/OCTB/2026",
+                   "11/OCTB/2026","18/OCTB/2026","25/OCTB/2026","01/NOV/2026",
+                   "08/NOV/2026")) %>% 
   select(Fecha, everything())
 
 pronostico2026$Point.Forecast <- round(pronostico2026$Point.Forecast,2)
@@ -778,7 +782,7 @@ kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
 
 ### Gráfica
 ```{r, fig.width=10, fig.height=6}
-fechas_labels <- c("27 Septiembre 26","04 Octubre 26","11 Octubre 26","18 Octubre 26","25 Octubre 26","01 Noviembre 26")
+fechas_labels <- c("04 Octubre 26","11 Octubre 26","18 Octubre 26","25 Octubre 26","01 Noviembre 26","08 Noviembre 26")
 tiempos_x <- as.numeric(time(pronostico$mean))
 
 autoplot(pronostico) +
@@ -789,7 +793,7 @@ autoplot(pronostico) +
   geom_hline(yintercept = pronostico2026$Hi.95[1], linetype = "dashed",
              color = "red", size = 1.1) +
 scale_x_continuous(breaks = tiempos_x, labels = fechas_labels) +
-  coord_cartesian(xlim=c(2026.4,2026.81), ylim=c(8.5,14)) +
+  coord_cartesian(xlim=c(2026.4,2026.83), ylim=c(8.5,14.5)) +
   labs(title = "Proyección del promedio semanal (Bs) del Dólar Blue",
     subtitle = "Septiembre 2026", y = "Promedio Bs", x = "")  + theme_minimal() +
   theme(plot.background = element_rect(fill = "#0d1117", color = NA),
@@ -810,30 +814,30 @@ scale_x_continuous(breaks = tiempos_x, labels = fechas_labels) +
 
 ### LUNES
 ```{r}
-dias <- c("lunes.24.agost","lunes.31.agost","lunes.07.sept","lunes.14.sept",
-          "martes.25.agost","martes.01.sept","martes.08.sept","martes.15.sept",
-          "miercoles.26.agost","miercoles.02.sept","miercoles.09.sept","miercoles.16.sept",
-          "jueves.27.agost","jueves.03.sept","jueves.10.sept","jueves.17.sept",
-          "viernes.28.agost","viernes.04.sept","viernes.11.sept","viernes.18.sept",
-          "sabado.29.agost","sabado.05.sept","sabado.12.sept","sabado.19.sept",
-          "domingo.30.agost","domingo.06.sept","domingo.13.sept","domingo.20.sept")
-fechas <- c("2026-08-24","2026-08-31","2026-09-07","2026-09-14",
-            "2026-08-25","2026-09-01","2026-09-08","2026-09-15",
-            "2026-08-26","2026-09-02","2026-09-09","2026-09-16",
-            "2026-08-27","2026-09-03","2026-09-10","2026-09-17",
-            "2026-08-28","2026-09-04","2026-09-11","2026-09-18",
-            "2026-08-29","2026-09-05","2026-09-12","2026-09-19",
-            "2026-08-30","2026-09-06","2026-09-13","2026-09-20")
+dias <- c("lunes.31.agost","lunes.07.sept","lunes.14.sept","lunes.21.sept",
+          "martes.01.sept","martes.08.sept","martes.15.sept","martes.22.sept",
+          "miercoles.02.sept","miercoles.09.sept","miercoles.16.sept","miercoles.23.sept",
+          "jueves.03.sept","jueves.10.sept","jueves.17.sept","jueves.24.sept",
+          "viernes.04.sept","viernes.11.sept","viernes.18.sept","viernes.25.sept",
+          "sabado.05.sept","sabado.12.sept","sabado.19.sept","sabado.26.sept",
+          "domingo.06.sept","domingo.13.sept","domingo.20.sept","domingo.27.sept")
+fechas <- c("2026-08-31","2026-09-07","2026-09-14","2026-09-21",
+            "2026-09-01","2026-09-08","2026-09-15","2026-09-22",
+            "2026-09-02","2026-09-09","2026-09-16","2026-09-23",
+            "2026-09-03","2026-09-10","2026-09-17","2026-09-24",
+            "2026-09-04","2026-09-11","2026-09-18","2026-09-25",
+            "2026-09-05","2026-09-12","2026-09-19","2026-09-26",
+            "2026-09-06","2026-09-13","2026-09-20","2026-09-27")
 
 for (i in 1:length(dias)) {assign(dias[i], df %>% 
                                     filter(format(fecha, "%Y-%m-%d") == fechas[i]))}
 
-dias <- list(lunes.24.agost,lunes.31.agost,lunes.07.sept,lunes.14.sept)
-dias_nombres <- c("Lunes 24 Agosto","Lunes 31 Agosto","Lunes 07 Septiembre","Lunes 14 Septiembre")
+dias <- list(lunes.31.agost,lunes.07.sept,lunes.14.sept,lunes.21.sept)
+dias_nombres <- c("Lunes 31 Agosto","Lunes 07 Septiembre","Lunes 14 Septiembre","Lunes 21 Septiembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-09-14", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-09-21", format(df_semana$fecha, "%H:%M:%S")))
 library(ggthemes)
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -861,12 +865,12 @@ data_lunes <- df_semana
 ### MARTES
 
 ```{r}
-dias <- list(martes.25.agost,martes.01.sept,martes.08.sept,martes.15.sept)
-dias_nombres <- c("Martes 25 Agosto","Martes 01 Septiembre","Martes 08 Septiembre","Martes 15 Septiembre")
+dias <- list(martes.01.sept,martes.08.sept,martes.15.sept,martes.22.sept)
+dias_nombres <- c("Martes 01 Septiembre","Martes 08 Septiembre","Martes 15 Septiembre","Martes 22 Septiembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-09-15", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-09-22", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -895,12 +899,12 @@ data_martes <- df_semana
 ### MIERCOLES
 
 ```{r}
-dias <- list(miercoles.26.agost,miercoles.02.sept,miercoles.09.sept,miercoles.16.sept)
-dias_nombres <- c("Miercoles 26 Agosto","Miercoles 02 Septiembre","Miercoles 09 Septiembre","Miercoles 16 Septiembre")
+dias <- list(miercoles.02.sept,miercoles.09.sept,miercoles.16.sept,miercoles.23.sept)
+dias_nombres <- c("Miercoles 02 Septiembre","Miercoles 09 Septiembre","Miercoles 16 Septiembre","Miercoles 23 Septiembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-09-16", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-09-23", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -928,12 +932,12 @@ data_miercoles <- df_semana
 ### JUEVES 
 
 ```{r}
-dias <- list(jueves.27.agost,jueves.03.sept,jueves.10.sept,jueves.17.sept)
-dias_nombres <- c("Jueves 27 Agosto","Jueves 03 Septiembre","Jueves 10 Septiembre","Jueves 17 Septiembre")
+dias <- list(jueves.03.sept,jueves.10.sept,jueves.17.sept,jueves.24.sept)
+dias_nombres <- c("Jueves 03 Septiembre","Jueves 10 Septiembre","Jueves 17 Septiembre","Jueves 24 Septiembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-09-17", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-09-24", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -961,12 +965,12 @@ data_jueves <- df_semana
 ### VIERNES
 
 ```{r}
-dias <- list(viernes.28.agost,viernes.04.sept,viernes.11.sept,viernes.18.sept)
-dias_nombres <- c("Viernes 28 Agosto","Viernes 04 Septiembre","Viernes 11 Septiembre","Viernes 18 Septiembre")
+dias <- list(viernes.04.sept,viernes.11.sept,viernes.18.sept,viernes.25.sept)
+dias_nombres <- c("Viernes 04 Septiembre","Viernes 11 Septiembre","Viernes 18 Septiembre","Viernes 25 Septiembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-09-18", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-09-25", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -994,12 +998,12 @@ data_viernes <- df_semana
 ### SABADO
 
 ```{r}
-dias <- list(sabado.29.agost,sabado.05.sept,sabado.12.sept,sabado.19.sept)
-dias_nombres <- c("Sabado 29 Agosto","Sabado 05 Septiembre","Sabado 12 Septiembre","Sabado 19 Septiembre")
+dias <- list(sabado.05.sept,sabado.12.sept,sabado.19.sept,sabado.26.sept)
+dias_nombres <- c("Sabado 05 Septiembre","Sabado 12 Septiembre","Sabado 19 Septiembre","Sabado 26 Septiembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-09-19", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-09-26", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -1027,12 +1031,12 @@ data_sabado <- df_semana
 ### DOMINGO
 
 ```{r}
-dias <- list(domingo.30.agost,domingo.06.sept,domingo.13.sept,domingo.20.sept)
-dias_nombres <- c("Domingo 30 Agosto","Domingo 06 Septiembre","Domingo 13 Septiembre","Domingo 20 Septiembre")
+dias <- list(domingo.06.sept,domingo.13.sept,domingo.20.sept,domingo.27.sept)
+dias_nombres <- c("Domingo 06 Septiembre","Domingo 13 Septiembre","Domingo 20 Septiembre","Domingo 27 Septiembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-09-20", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-09-27", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -2043,10 +2047,10 @@ df_dia <- df_dia %>%
 # ==============================================================================
 # LUNES
 # ==============================================================================
-df_dia_norm <- df_dia %>% slice(-(1:368))
+df_dia_norm <- df_dia %>% slice(-(1:396))
 
 df_lunes <- df_dia_norm %>% filter(Detalle == "Lunes")
-ts_semana_lunes <- ts(df_lunes$Promedio, start = c(2025, 31), frequency = 52)
+ts_semana_lunes <- ts(df_lunes$Promedio, start = c(2025, 35), frequency = 52)
 
 modelo_lunes <- auto.arima(ts_semana_lunes)
 # summary(modelo_lunes)
@@ -2055,30 +2059,30 @@ modelo_lunes <- auto.arima(ts_semana_lunes)
 # sort(-abs(myboxplot1$out))
 # modelo_lunes$residuals
 
-ds1 <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds1 <- ts(c(0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #15
+          start = c(2025, 35), frequency = 52) #3
 
-ds2 <- ts(c(0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds2 <- ts(c(0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #6
+          start = c(2025, 35), frequency = 52) #11
 
 ds3 <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-            0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,1,
+            0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,
             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #60
+          start = c(2025, 35), frequency = 52) #56
 
-# ds4 <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-#           start = c(2025, 11), frequency = 52) #
-# 
+ds4 <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+          start = c(2025, 35), frequency = 52) #51
+ 
 # ds5 <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
 #             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
 #             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
@@ -2109,10 +2113,10 @@ ds3 <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,
 #             0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
 #           start = c(2025, 7), frequency = 52) #21
 
-exogen_lunes <- cbind(ds1,ds2,ds3)
+exogen_lunes <- cbind(ds1)
 exogen1 <- head(exogen_lunes, length(ts_semana_lunes))
 
-modelo1 <- Arima(ts_semana_lunes, order = c(1,1,1), xreg = as.matrix(exogen1), include.mean = TRUE)
+modelo1 <- Arima(ts_semana_lunes, order = c(5,2,0), xreg = as.matrix(exogen1), include.mean = TRUE)
 
 # summary(modelo1)
 # resid01 <- modelo1$residuals
@@ -2129,7 +2133,7 @@ pronostico_lunes <- pronostico$lower[1]
 # MARTES
 # ==============================================================================
 df_martes <- df_dia_norm %>% filter(Detalle == "Martes")
-ts_semana_martes <- ts(df_martes$Promedio, start = c(2025, 31), frequency = 52)
+ts_semana_martes <- ts(df_martes$Promedio, start = c(2025, 35), frequency = 52)
 
 modelo_martes <- auto.arima(ts_semana_martes)
 # summary(modelo_martes)
@@ -2138,53 +2142,47 @@ modelo_martes <- auto.arima(ts_semana_martes)
 # sort(-abs(myboxplot1$out))
 # modelo_martes$residuals
 
-ds1_mar <- ts(c(0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds1_mar <- ts(c(0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #6
-
-ds2_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 35), frequency = 52) #3
+ds2_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+          start = c(2025, 35), frequency = 52) #56
+ds3_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #16
-
-ds3_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,1,
+          start = c(2025, 35), frequency = 52) #12
+ds4_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,1,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #60
-
-ds4_mar <- ts(c(0,0,0,0,0,0,1,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 35), frequency = 52) #57
+ds5_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #7
-
-ds5_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #15
-
+          start = c(2025, 35), frequency = 52) #11
 ds6_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #52
-
-ds7_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #19
-
-ds8_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #12
+          start = c(2025, 35), frequency = 52) #48
+# ds7_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+#           start = c(2025, 31), frequency = 52) #19
+# 
+# ds8_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+#           start = c(2025, 31), frequency = 52) #12
 
 # ds9_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
 #                 0,0,0,0,0,0,0,0,0,1,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
@@ -2192,10 +2190,10 @@ ds8_mar <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,
 #                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
 #           start = c(2025, 7), frequency = 52) #39
 
-exogen_mar <- cbind(ds1_mar,ds2_mar,ds3_mar,ds4_mar,ds5_mar,ds6_mar)
+exogen_mar <- cbind(ds1_mar,ds2_mar)
 exogen1_mar <- head(exogen_mar, length(ts_semana_martes))
 
-modelo1_mar <- fit_arima_safe(ts_semana_martes, order = c(0,1,0), xreg = as.matrix(exogen1_mar), include.mean = TRUE)
+modelo1_mar <- fit_arima_safe(ts_semana_martes, order = c(2,2,1), xreg = as.matrix(exogen1_mar), include.mean = TRUE)
 
 # summary(modelo1_mar)
 # resid01 <- modelo1_mar$residuals
@@ -2207,12 +2205,11 @@ exogen2_mar <- matrix(0, nrow = 4, ncol = ncol(modelo1_mar$xreg))
 pronostico_mar <- forecast(modelo1_mar, h = 4, level = c(50), xreg = exogen2_mar)
 pronostico_martes <- pronostico_mar$lower[1]
 
-
 # ==============================================================================
 # MIÉRCOLES
 # ==============================================================================
 df_miercoles <- df_dia_norm %>% filter(Detalle == "Miércoles")
-ts_semana_miercoles <- ts(df_miercoles$Promedio, start = c(2025, 31), frequency = 52)
+ts_semana_miercoles <- ts(df_miercoles$Promedio, start = c(2025, 35), frequency = 52)
 
 modelo_miercoles <- auto.arima(ts_semana_miercoles)
 # summary(modelo_miercoles)
@@ -2221,71 +2218,64 @@ modelo_miercoles <- auto.arima(ts_semana_miercoles)
 # sort(-abs(myboxplot1$out))
 # modelo_miercoles$residuals
 
-ds1_mie <- ts(c(0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds1_mie <- ts(c(0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #6
-
+          start = c(2025, 35), frequency = 52) #3
 ds2_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,1,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #60
-
-ds3_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 35), frequency = 52) #56
+ds3_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,1,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #16
-
-ds4_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 35), frequency = 52) #57
+ds4_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #15
-
+          start = c(2025, 35), frequency = 52) #12
 ds5_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #52
-
-ds6_mie <- ts(c(0,0,0,0,0,0,1,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 35), frequency = 52) #48
+ds6_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #7
-
+          start = c(2025, 35), frequency = 52) #11
 ds7_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,1,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #40
-
-ds8_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,1,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #14
-
-ds9_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 35), frequency = 52) #36
+ds8_mie <- ts(c(0,0,0,0,0,0,0,0,0,1,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #19
+          start = c(2025, 35), frequency = 52) #10
 
-ds10_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,1,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 31), frequency = 52) #53
+# ds9_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+#           start = c(2025, 31), frequency = 52) #19
+# 
+# ds10_mie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,1,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+#           start = c(2025, 31), frequency = 52) #53
 
 
-exogen_mie <- cbind(ds1_mie,ds2_mie,ds3_mie,ds4_mie,ds5_mie)
+exogen_mie <- cbind(ds1_mie,ds2_mie,ds3_mie)
 exogen1_mie <- head(exogen_mie, length(ts_semana_miercoles))
 
-modelo1_mie <- fit_arima_safe(ts_semana_miercoles, order = c(0,1,0), xreg = as.matrix(exogen1_mie), include.mean = TRUE)
+modelo1_mie <- fit_arima_safe(ts_semana_miercoles, order = c(2,2,1), xreg = as.matrix(exogen1_mie), include.mean = TRUE)
  
 # summary(modelo1_mie)
 # resid01 <- modelo1_mie$residuals
@@ -2302,7 +2292,7 @@ pronostico_miercoles <- pronostico_mie$lower[1]
 # JUEVES
 # ==============================================================================
 df_jueves <- df_dia_norm %>% filter(Detalle == "Jueves")
-ts_semana_jueves <- ts(df_jueves$Promedio, start = c(2025, 30), frequency = 52)
+ts_semana_jueves <- ts(df_jueves$Promedio, start = c(2025, 34), frequency = 52)
 
 modelo_jueves <- auto.arima(ts_semana_jueves)
 # summary(modelo_jueves)
@@ -2311,61 +2301,61 @@ modelo_jueves <- auto.arima(ts_semana_jueves)
 # sort(-abs(myboxplot1$out))
 # modelo_jueves$residuals
 
-ds1_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds1_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #16
-ds2_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #18
+ds2_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+          start = c(2025, 34), frequency = 52) #58
+ds3_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #22
-ds3_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,1,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #53
+          start = c(2025, 34), frequency = 52) #12
 ds4_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                1,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #61
-ds5_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,1,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #15
+          start = c(2025, 34), frequency = 52) #57
+ds5_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+          start = c(2025, 34), frequency = 52) #51
 ds6_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #55
-ds7_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,1,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #23
-ds8_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,1,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #49
+ds7_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #17
-ds9_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,1,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #56
+ds8_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #20
-ds10_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,
+          start = c(2025, 34), frequency = 52) #11
+ds9_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #28
+          start = c(2025, 34), frequency = 52) #19
+# ds10_jue <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+#           start = c(2025, 30), frequency = 52) #28
 
-exogen_jue <- cbind(ds1_jue)
+exogen_jue <- cbind(ds1_jue,ds2_jue,ds3_jue,ds4_jue,ds5_jue)
 exogen1_jue <- head(exogen_jue, length(ts_semana_jueves))
 
-modelo1_jue <- fit_arima_safe(ts_semana_jueves, order = c(0,1,0), xreg = as.matrix(exogen1_jue), include.mean = TRUE)
+modelo1_jue <- fit_arima_safe(ts_semana_jueves, order = c(1,2,1), xreg = as.matrix(exogen1_jue), include.mean = TRUE)
 
 # summary(modelo1_jue)
 # resid01 <- modelo1_jue$residuals
@@ -2381,7 +2371,7 @@ pronostico_jueves <- pronostico_jue$lower[1]
 # VIERNES
 # ==============================================================================
 df_viernes <- df_dia_norm %>% filter(Detalle == "Viernes")
-ts_semana_viernes <- ts(df_viernes$Promedio, start = c(2025, 30), frequency = 52)
+ts_semana_viernes <- ts(df_viernes$Promedio, start = c(2025, 34), frequency = 52)
 
 modelo_viernes <- auto.arima(ts_semana_viernes)
 # summary(modelo_viernes)
@@ -2391,61 +2381,61 @@ modelo_viernes <- auto.arima(ts_semana_viernes)
 # modelo_viernes$residuals
 
 ds1_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,1,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #53
-ds2_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #15
-ds3_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,1,
+          start = c(2025, 34), frequency = 52) #49
+ds2_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #60
-ds4_vie <- ts(c(0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #56
+ds3_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #3
-ds5_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #11
+ds4_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #22
-ds6_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #18
+ds5_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #16
-ds7_vie <- ts(c(0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #12
+ds6_vie <- ts(c(0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #6
+          start = c(2025, 34), frequency = 52) #3
+ds7_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,1,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+          start = c(2025, 34), frequency = 52) #47
 ds8_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #51
-ds9_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #55
-ds10_vie <- ts(c(0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #51
+ds9_vie <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #5
+          start = c(2025, 34), frequency = 52) #16
+# ds10_vie <- ts(c(0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+#           start = c(2025, 30), frequency = 52) #5
 
 
-exogen_vie <- cbind(ds1_vie,ds2_vie,ds3_vie,ds4_vie)
+exogen_vie <- cbind(ds1_vie,ds2_vie,ds3_vie,ds4_vie,ds5_vie)
 exogen1_vie <- head(exogen_vie, length(ts_semana_viernes))
 
-modelo1_vie <- fit_arima_safe(ts_semana_viernes, order = c(1,2,3), xreg = as.matrix(exogen1_vie), include.mean = TRUE)
+modelo1_vie <- fit_arima_safe(ts_semana_viernes, order = c(2,2,2), xreg = as.matrix(exogen1_vie), include.mean = TRUE)
 
 # summary(modelo1_vie)
 # resid01 <- modelo1_vie$residuals
@@ -2462,7 +2452,7 @@ pronostico_viernes <- pronostico_vie$lower[1]
 # SÁBADO
 # ==============================================================================
 df_sabado <- df_dia_norm %>% filter(Detalle == "Sábado")
-ts_semana_sabado <- ts(df_sabado$Promedio, start = c(2025, 30), frequency = 52)
+ts_semana_sabado <- ts(df_sabado$Promedio, start = c(2025, 34), frequency = 52)
 
 modelo_sabado <- auto.arima(ts_semana_sabado)
 # summary(modelo_sabado)
@@ -2471,62 +2461,62 @@ modelo_sabado <- auto.arima(ts_semana_sabado)
 # sort(-abs(myboxplot1$out))
 # modelo_sabado$residuals
 
-ds1_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds1_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #15
-ds2_sab <- ts(c(0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #11
+ds2_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+          start = c(2025, 34), frequency = 52) #56
+ds3_sab <- ts(c(0,0,0,1,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #3
-ds3_sab <- ts(c(0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #4
+ds4_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #6
-ds4_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,1,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #60
+          start = c(2025, 34), frequency = 52) #18
 ds5_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,1,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #53
-ds6_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #22
-ds7_sab <- ts(c(0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #49
+ds6_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #8
-ds8_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #55
-ds9_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #51
+ds7_sab <- ts(c(0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #16
-ds10_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #3
+ds8_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #12
+          start = c(2025, 34), frequency = 52) #12
+# ds9_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+#           start = c(2025, 30), frequency = 52) #16
+# ds10_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,1,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+#           start = c(2025, 30), frequency = 52) #12
 
 
-exogen_sab <- cbind(ds1_sab,ds2_sab,ds3_sab,ds4_sab)
+exogen_sab <- cbind(ds1_sab,ds2_sab,ds3_sab)
 exogen1_sab <- head(exogen_sab, length(ts_semana_sabado))
 
-modelo1_sab <- fit_arima_safe(ts_semana_sabado, order = c(1,2,2), xreg = as.matrix(exogen1_sab), include.mean = TRUE)
+modelo1_sab <- fit_arima_safe(ts_semana_sabado, order = c(1,2,1), xreg = as.matrix(exogen1_sab), include.mean = TRUE)
  
 # summary(modelo1_sab)
 # resid01 <- modelo1_sab$residuals
@@ -2542,7 +2532,7 @@ pronostico_sabado <- pronostico_sab$lower[1]
 # DOMINGO
 # ==============================================================================
 df_domingo <- df_dia_norm %>% filter(Detalle == "Domingo")
-ts_semana_domingo <- ts(df_domingo$Promedio, start = c(2025, 30), frequency = 52)
+ts_semana_domingo <- ts(df_domingo$Promedio, start = c(2025, 34), frequency = 52)
 
 modelo_domingo <- auto.arima(ts_semana_domingo)
 # summary(modelo_domingo)
@@ -2551,56 +2541,56 @@ modelo_domingo <- auto.arima(ts_semana_domingo)
 # sort(-abs(myboxplot1$out))
 # modelo_domingo$residuals
 
-ds1_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds1_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #15
+          start = c(2025, 34), frequency = 52) #11
 ds2_dom <- ts(c(0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #3
-ds3_dom <- ts(c(0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #3
+ds3_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+          start = c(2025, 34), frequency = 52) #56
+ds4_dom <- ts(c(0,0,0,1,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #6
-ds4_dom <- ts(c(0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+          start = c(2025, 34), frequency = 52) #4
+ds5_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #5
-ds5_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,1,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #60
+          start = c(2025, 34), frequency = 52) #18
 ds6_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,1,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-          start = c(2025, 30), frequency = 52) #53
-# ds7_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#                 0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-#           start = c(2025, 12), frequency = 52) #33
-# ds8_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#                 0,0,1,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
-#           start = c(2025, 12), frequency = 52) #33
+          start = c(2025, 34), frequency = 52) #49
+ds7_dom <- ts(c(0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+          start = c(2025, 34), frequency = 52) #8
+ds8_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
+          start = c(2025, 34), frequency = 52) #51
 # ds9_dom <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,1,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
 #                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
 #                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
 #                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
 #           start = c(2025, 12), frequency = 52) #16
 
-exogen_dom <- cbind(ds1_dom,ds2_dom,ds3_dom)
+exogen_dom <- cbind(ds1_dom,ds2_dom,ds3_dom,ds4_dom)
 exogen1_dom <- head(exogen_dom, length(ts_semana_domingo))
 
-modelo1_dom <- fit_arima_safe(ts_semana_domingo, order = c(1,2,2), xreg = as.matrix(exogen1_dom), include.mean = TRUE)
+modelo1_dom <- fit_arima_safe(ts_semana_domingo, order = c(1,2,1), xreg = as.matrix(exogen1_dom), include.mean = TRUE)
 
 # summary(modelo1_dom)
 # resid01 <- modelo1_dom$residuals
@@ -2615,8 +2605,8 @@ pronostico_domingo <- pronostico_dom$lower[1]
 
 library(ggplot2)
 
-x <- c("Lunes 21 Septiembre","Martes 22 Septiembre","Miercoles 23 Septiembre","Jueves 24 Septiembre",
-       "Viernes 25 Septiembre","Sabado 26 Septiembre","Domingo 27 Septiembre")
+x <- c("Lunes 28 Septiembre","Martes 29 Septiembre","Miercoles 30 Septiembre","Jueves 01 Septiembre",
+       "Viernes 02 Septiembre","Sabado 03 Septiembre","Domingo 04 Septiembre")
 # Tu vector de referencia
 y <- c(pronostico_lunes,pronostico_martes,pronostico_miercoles,pronostico_jueves,
        pronostico_viernes,pronostico_sabado,pronostico_domingo)# original
