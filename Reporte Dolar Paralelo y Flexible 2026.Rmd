@@ -2605,8 +2605,8 @@ pronostico_domingo <- pronostico_dom$lower[1]
 
 library(ggplot2)
 
-x <- c("Lunes 28 Septiembre","Martes 29 Septiembre","Miercoles 30 Septiembre","Jueves 01 Septiembre",
-       "Viernes 02 Septiembre","Sabado 03 Septiembre","Domingo 04 Septiembre")
+x <- c("Lunes 28 Septiembre","Martes 29 Septiembre","Miercoles 30 Septiembre","Jueves 01 Octubre",
+       "Viernes 02 Octubre","Sabado 03 Octubre","Domingo 04 Octubre")
 # Tu vector de referencia
 y <- c(pronostico_lunes,pronostico_martes,pronostico_miercoles,pronostico_jueves,
        pronostico_viernes,pronostico_sabado,pronostico_domingo)# original
