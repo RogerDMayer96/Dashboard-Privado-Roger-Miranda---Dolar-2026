@@ -1600,108 +1600,103 @@ tabla_kable <- df %>%
   add_header_above(setNames(4, titulo))
 
 tabla_kable
-```
-
-
-
-```{r eval=FALSE, include=FALSE}
-library(rvest)
-library(dplyr)
-library(stringr)
-library(tidyr)
-
-url_tabla <- "https://www.bcb.gob.bo/bcb_tco_publico_evolutivo.php"   # <-- URL corregida
-
-# --- 1. Descargar y parsear el HTML -----------------------------------
-pagina <- safe_read_html(url_tabla)
-
-# --- 2. Ubicar la tabla (clase "bcb-table") ----------------------------
-tabla_nodo <- pagina |> html_element("table.bcb-table")
-
-if (is.na(tabla_nodo)) {
-  tablas <- pagina |> html_elements("table")
-  tabla_nodo <- tablas[
-    sapply(tablas, function(t) {
-      any(str_detect(html_text(html_elements(t, "th")), "Entidad Bancaria"))
-    })
-  ][[1]]
-}
-
-# --- 3. Convertir a data frame -----------------------------------------
-tco <- tabla_nodo |> html_table(fill = TRUE)
-
-# ... el resto de tu script sigue igual
-
-# --- 4. Limpieza: nombres de columnas y formato de numeros -------------
-# El BCB usa coma decimal y "-" para "sin dato"
-names(tco)[1] <- "Entidad_Bancaria"
-
-tco_limpio <- tco |>
-  mutate(across(
-    -Entidad_Bancaria,
-    ~ na_if(str_trim(.x), "\u2014") |>          # guion largo "—"
-      str_replace_all("\\.", "") |>              # por si hay separador de miles
-      str_replace_all(",", ".") |>               # coma decimal -> punto
-      as.numeric()
-  ))
-
-
-library(tidyverse)
-library(heatmaply)
-
-# 1. Matriz original con valores reales
-matriz_original <- tco_limpio %>%
-  column_to_rownames("Entidad_Bancaria") %>%
-  as.matrix()
-
-# 2. Matriz estandarizada por columna (para los colores de cada fecha)
-matriz_color <- apply(matriz_original, 2, function(x) {
-  if (all(is.na(x))) return(x)
-  (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
-})
-
-# Para matriz_original
-rownames(matriz_original)[rownames(matriz_original) == "BANCO DE LA NACIÃ\u0093N ARGENTINA"] <- "BANCO DE LA NACION ARGENTINA"
-
-# Para matriz_color
-rownames(matriz_color)[rownames(matriz_color) == "BANCO DE LA NACIÃ\u0093N ARGENTINA"] <- "BANCO DE LA NACION ARGENTINA"
-
-# --- 3. Heatmap interactivo con despliegue horizontal tipo columna fija ---
-heatmaply(
-  matriz_color,                       # Usa la matriz 0-1 para los colores
-  cellnote = matriz_original,         # Escribe los valores REALES dentro de los cuadros
-  cellnote_size = 10,
-  custom_hovertext = matriz_original, # Muestra el valor REAL en el tooltip flotante
-  dendrogram = "none",
-  xlab = "",
-  ylab = "",
-  main = "Tipo de Cambio Oficial - Compra (Bs/$us)",
-  colors = colorRampPalette(c("#0d1117", "#537D8D", "#1ee29d"))(100),
-  na.value = "#161b22",
-  grid_color = "#30363d",
-  fontsize_row = 9,
-  fontsize_col = 9
-) %>%
-  layout(
-    paper_bgcolor = "#0d1117",
-    plot_bgcolor  = "#0d1117",
-    font = list(color = "#e6edf3"),
-    title = list(font = list(color = "#e6edf3")),
-    
-    # --- CONFIGURACIÓN DE DESPLAZAMIENTO HORIZONTAL ---
-    xaxis = list(
-      fixedrange = FALSE,                    # Permite arrastrar / hacer zoom horizontal
-      range = c(-0.5, 9.5),                  # Muestra 10 fechas inicialmente (ajustable)
-      rangeslider = list(                    # Agrega la barra de desplazamiento horizontal
-        visible = TRUE, 
-        thickness = 0.04,
-        bgcolor = "#161b22"
-      )
-    ),
-    yaxis = list(
-      fixedrange = TRUE                      # FIJA la columna de Entidades Bancarias
-    )
-  )
+# library(rvest)
+# library(dplyr)
+# library(stringr)
+# library(tidyr)
+# 
+# url_tabla <- "https://www.bcb.gob.bo/bcb_tco_publico_evolutivo.php"   # <-- URL corregida
+# 
+# # --- 1. Descargar y parsear el HTML -----------------------------------
+# pagina <- safe_read_html(url_tabla)
+# 
+# # --- 2. Ubicar la tabla (clase "bcb-table") ----------------------------
+# tabla_nodo <- pagina |> html_element("table.bcb-table")
+# 
+# if (is.na(tabla_nodo)) {
+#   tablas <- pagina |> html_elements("table")
+#   tabla_nodo <- tablas[
+#     sapply(tablas, function(t) {
+#       any(str_detect(html_text(html_elements(t, "th")), "Entidad Bancaria"))
+#     })
+#   ][[1]]
+# }
+# 
+# # --- 3. Convertir a data frame -----------------------------------------
+# tco <- tabla_nodo |> html_table(fill = TRUE)
+# 
+# # ... el resto de tu script sigue igual
+# 
+# # --- 4. Limpieza: nombres de columnas y formato de numeros -------------
+# # El BCB usa coma decimal y "-" para "sin dato"
+# names(tco)[1] <- "Entidad_Bancaria"
+# 
+# tco_limpio <- tco |>
+#   mutate(across(
+#     -Entidad_Bancaria,
+#     ~ na_if(str_trim(.x), "\u2014") |>          # guion largo "—"
+#       str_replace_all("\\.", "") |>              # por si hay separador de miles
+#       str_replace_all(",", ".") |>               # coma decimal -> punto
+#       as.numeric()
+#   ))
+# 
+# 
+# library(tidyverse)
+# library(heatmaply)
+# 
+# # 1. Matriz original con valores reales
+# matriz_original <- tco_limpio %>%
+#   column_to_rownames("Entidad_Bancaria") %>%
+#   as.matrix()
+# 
+# # 2. Matriz estandarizada por columna (para los colores de cada fecha)
+# matriz_color <- apply(matriz_original, 2, function(x) {
+#   if (all(is.na(x))) return(x)
+#   (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+# })
+# 
+# # Para matriz_original
+# rownames(matriz_original)[rownames(matriz_original) == "BANCO DE LA NACIÃ\u0093N ARGENTINA"] <- "BANCO DE LA NACION ARGENTINA"
+# 
+# # Para matriz_color
+# rownames(matriz_color)[rownames(matriz_color) == "BANCO DE LA NACIÃ\u0093N ARGENTINA"] <- "BANCO DE LA NACION ARGENTINA"
+# 
+# # --- 3. Heatmap interactivo con despliegue horizontal tipo columna fija ---
+# heatmaply(
+#   matriz_color,                       # Usa la matriz 0-1 para los colores
+#   cellnote = matriz_original,         # Escribe los valores REALES dentro de los cuadros
+#   cellnote_size = 10,
+#   custom_hovertext = matriz_original, # Muestra el valor REAL en el tooltip flotante
+#   dendrogram = "none",
+#   xlab = "",
+#   ylab = "",
+#   main = "Tipo de Cambio Oficial - Compra (Bs/$us)",
+#   colors = colorRampPalette(c("#0d1117", "#537D8D", "#1ee29d"))(100),
+#   na.value = "#161b22",
+#   grid_color = "#30363d",
+#   fontsize_row = 9,
+#   fontsize_col = 9
+# ) %>%
+#   layout(
+#     paper_bgcolor = "#0d1117",
+#     plot_bgcolor  = "#0d1117",
+#     font = list(color = "#e6edf3"),
+#     title = list(font = list(color = "#e6edf3")),
+#     
+#     # --- CONFIGURACIÓN DE DESPLAZAMIENTO HORIZONTAL ---
+#     xaxis = list(
+#       fixedrange = FALSE,                    # Permite arrastrar / hacer zoom horizontal
+#       range = c(-0.5, 9.5),                  # Muestra 10 fechas inicialmente (ajustable)
+#       rangeslider = list(                    # Agrega la barra de desplazamiento horizontal
+#         visible = TRUE, 
+#         thickness = 0.04,
+#         bgcolor = "#161b22"
+#       )
+#     ),
+#     yaxis = list(
+#       fixedrange = TRUE                      # FIJA la columna de Entidades Bancarias
+#     )
+#   )
 
 
 ```
