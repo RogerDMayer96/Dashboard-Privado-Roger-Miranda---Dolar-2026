@@ -1521,7 +1521,8 @@ url_bcb_tabla <- "https://www.bcb.gob.bo/bcb_tco_publico_ultima_cotizacion.php"
 # ---- 1. Extraer tabla y fecha de corte ---------------------------------
 obtener_tco_bcb <- function(url) {
   tryCatch({
-    pagina <- read_html(url)
+    leer <- if (exists("safe_read_html")) safe_read_html else read_html
+    pagina <- leer(url)
 
     tabla_bruta <- pagina %>%
       html_element(".tco-public-card table") %>%   # o simplemente "table"
@@ -1552,25 +1553,27 @@ obtener_tco_bcb <- function(url) {
 
 # ---- 2. Funciones auxiliares -------------------------------------------
 fmt_es <- function(x, dec = 0) {
-  formatC(x, format = "f", digits = dec, big.mark = ".", decimal.mark = ",")
+  ifelse(is.na(x), "-",
+         formatC(x, format = "f", digits = dec, big.mark = ".", decimal.mark = ","))
 }
 
-# Barra proporcional; la escala se calcula SIN la fila de totales
-barra_col <- function(x, texto, es_total, clase, desde_cero = TRUE) {
-  ref <- x[!es_total]
-  rango <- max(ref, na.rm = TRUE) - min(ref, na.rm = TRUE)
+# Barra como fondo de la celda; la escala ignora las filas agregadas
+barra_col <- function(x, texto, es_agregada, color, desde_cero = TRUE) {
+  ref   <- x[!es_agregada & !is.na(x)]
+  rango <- max(ref) - min(ref)
 
   prop <- if (desde_cero || rango == 0) {
-    x / max(ref, na.rm = TRUE)
+    x / max(ref)
   } else {
-    0.15 + 0.85 * (x - min(ref, na.rm = TRUE)) / rango
+    0.15 + 0.85 * (x - min(ref)) / rango
   }
+  pct <- round(pmin(pmax(prop, 0), 1) * 100, 1)
 
   html <- sprintf(
-    '<div class="barra-celda"><span class="barra %s" style="display:inline-block; width:%.1f%%;">%s</span></div>',
-    clase, prop * 100, texto
+    '<div style="background:linear-gradient(to right, %s %s%%, transparent %s%%); padding:2px 6px; text-align:right;">%s</div>',
+    color, pct, pct, texto
   )
-  ifelse(es_total, texto, html)   # la fila de totales va solo como texto
+  ifelse(es_agregada | is.na(x), texto, html)
 }
 
 # ---- 3. Construir la tabla ----------------------------------------------
@@ -1579,23 +1582,31 @@ stopifnot(!is.null(res))
 
 titulo <- "TIPO DE CAMBIO OFICIAL DEL DÓLAR ESTADOUNIDENSE"
 
-# Detecta la fila de totales ("TOTAL", "TOTALES", etc.)
-es_total <- grepl("^\\s*total", res$tabla$Entidad, ignore.case = TRUE)
+# Filas que NO llevan barras: "TOTALES" y "BANCOS (MEDIANA PONDERADA ...)"
+es_agregada <- grepl("^\\s*(total|bancos)", res$tabla$Entidad, ignore.case = TRUE)
+
+# Colores con variables CSS: tu dashboard puede redefinirlas (--barra-compra, etc.)
+col_compra <- "var(--barra-compra, rgba(158,202,225,.55))"
+col_monto  <- "var(--barra-monto, rgba(161,217,155,.55))"
+col_trans  <- "var(--barra-transacciones, rgba(253,174,107,.55))"
 
 df <- res$tabla %>%
   mutate(
-    Compra        = barra_col(Compra,        fmt_es(Compra, 2),        es_total, "barra-compra", desde_cero = FALSE),
-    Monto         = barra_col(Monto,         fmt_es(Monto, 2),         es_total, "barra-monto"),
-    Transacciones = barra_col(Transacciones, fmt_es(Transacciones, 0), es_total, "barra-transacciones")
+    Compra        = barra_col(Compra,        fmt_es(Compra, 2),        es_agregada, col_compra, desde_cero = FALSE),
+    Monto         = barra_col(Monto,         fmt_es(Monto, 2),         es_agregada, col_monto),
+    Transacciones = barra_col(Transacciones, fmt_es(Transacciones, 0), es_agregada, col_trans)
   )
 
 tabla_kable <- df %>%
   kable(
     format = "html", escape = FALSE,
-    col.names = c("Entidad", "Compra (Bs/$us)", "Monto ($us)", "Número de transacciones"),
+    col.names = c("Entidad", "Compra (Bs/&#36;us)", "Monto (&#36;us)", "Número de transacciones"),
     align = c("l", "r", "r", "r"),
     table.attr = 'class="tabla-tco"'
   ) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE, font_size = 13) %>%
+  kable_minimal() %>%
   add_header_above(setNames(4, res$subtitulo)) %>%
   add_header_above(setNames(4, titulo))
 
