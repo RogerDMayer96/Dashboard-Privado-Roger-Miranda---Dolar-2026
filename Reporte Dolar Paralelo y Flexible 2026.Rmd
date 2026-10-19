@@ -2220,11 +2220,11 @@ exogen1 <- head(exogen_lunes, length(ts_semana_lunes))
 
 modelo1 <- Arima(ts_semana_lunes, order = c(0,1,0), xreg = as.matrix(exogen1), include.mean = TRUE)
 
-summary(modelo1)
-resid01 <- modelo1$residuals
-jarque.bera.test(resid01)
-shapiro.test(resid01)
-Box.test(resid01, type="Ljung-Box")
+#summary(modelo1)
+#resid01 <- modelo1$residuals
+#jarque.bera.test(resid01)
+#shapiro.test(resid01)
+#Box.test(resid01, type="Ljung-Box")
 
 exogen2 <- matrix(0, nrow = 4, ncol = ncol(modelo1$xreg))
 # 3. Ejecuta el pronóstico (ahora sí funcionará sin errores)
