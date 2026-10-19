@@ -1379,7 +1379,7 @@ databcb$Estado <- cell_spec(
     TRUE                                   ~ "#27ae60"))
 
 # Tabla final (escape = FALSE para que se interprete el HTML)
-kable(databcb, caption = "Información del BCB y Binance",
+kable(databcb, format = "html", caption = "Información del BCB y Binance",
       align = c("l", "c", "c", "l", "c"), escape = FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
                 full_width = FALSE, font_size = 13) %>%
