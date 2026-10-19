@@ -1349,26 +1349,19 @@ databcb$Brecha <- round(databcb$Brecha, 2)
 
 databcb <- na.omit(databcb)
 
-rownames(databcb) <- NULL
-
-databcb <- na.omit(databcb)
-
-# 1. Último registro primero
+# CAMBIO 1: último registro primero
 databcb <- databcb %>% arrange(desc(fecha))
 
 rownames(databcb) <- NULL
 
-# 2. Barras en Brecha (proporcionales al máximo histórico)
+# CAMBIO 2: barras en Brecha (una sola vez, HTML en una sola línea)
 max_brecha <- max(databcb$Brecha, na.rm = TRUE)
 
 databcb$Brecha <- sprintf(
-  '<div style="display:flex;align-items:center;gap:6px;">
-     <div style="background:#4e79a7;height:12px;width:%dpx;border-radius:2px;"></div>
-     <span>%.2f</span>
-   </div>',
-  round(databcb$Brecha / max_brecha * 90), databcb$Brecha)
+  '<div style="display:flex;align-items:center;gap:6px;"><div style="background:#4e79a7;height:12px;width:%dpx;border-radius:2px;"></div><span>%.2f</span></div>',
+  round(databcb$Brecha / max_brecha * 120), databcb$Brecha)
 
-# 3. Color de letra en Estado según categoría
+# CAMBIO 3: color de letra en Estado según categoría
 databcb$Estado <- cell_spec(
   databcb$Estado, format = "html", bold = TRUE,
   color = case_when(
@@ -1378,7 +1371,7 @@ databcb$Estado <- cell_spec(
     databcb$Estado == "Baja"               ~ "#2e86c1",
     TRUE                                   ~ "#27ae60"))
 
-# Tabla final (escape = FALSE para que se interprete el HTML)
+# 6. Renderizamos la tabla final
 kable(databcb, format = "html", caption = "Información del BCB y Binance",
       align = c("l", "c", "c", "l", "c"), escape = FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
