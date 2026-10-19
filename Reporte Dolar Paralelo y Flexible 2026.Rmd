@@ -31,15 +31,14 @@ destino_correo <- "roger_miranda_@outlook.com"
 # Lista de correos autorizados
 correos_autorizados <- c(
   "rogerandymiranda01@gmail.com",
-  "borja.william@gmail.com" 
-)
+  "borja.william@gmail.com" )
 
 # Hash SHA-256 de los correos autorizados
 hashes_correos <- vapply(
   tolower(trimws(correos_autorizados)),
   function(e) digest::digest(e, algo = "sha256", serialize = FALSE),
-  character(1)
-)
+  character(1))
+
 hashes_correos_json <- jsonlite::toJSON(unname(hashes_correos))
 
 # Leer plantilla e inyectar valores (el gate vive dentro de sidebar2026.html,
@@ -626,7 +625,7 @@ library(dplyr)
 library(lubridate) # Asegúrate de tener cargado lubridate si necesitas trabajar con fechas
 
 promedio_por_semana <- promedio_por_semana %>%
-  filter(Semana >= as.POSIXct("2025-11-01"))
+  filter(Semana >= as.POSIXct("2025-12-01"))
 
 ts_semana <- ts(promedio_por_semana$Promedio, 
                 start = c(2025, isoweek(min(promedio_por_semana$Semana))), 
@@ -646,38 +645,39 @@ ts_semana <- ts(promedio_por_semana$Promedio,
 
 # Creamos variables de impulso 
 ds1 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,1,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,1,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#36
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#40
 
 ds2 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,1,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,1,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#45
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#42
 
 ds3 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,1,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   1,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#44
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0)#41
 
-ds4 <- c(0,0,0,1,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds4 <- c(0,1,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#4
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#2
 
-ds5 <- c(0,0,1,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds5 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     1,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#3
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#21
 
-ds6 <- c(0,0,0,0,1,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+ds6 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         1,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#31
+
+ds7 <- c(0,0,0,0,0,0,0,1,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#5
-# ds7 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,1,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#63
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#8
 # ds8 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,
 #          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
 #          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
@@ -699,7 +699,7 @@ d_s3 <- ts(ds3, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequ
 d_s4 <- ts(ds4, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 d_s5 <- ts(ds5, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 d_s6 <- ts(ds6, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
-# d_s7 <- ts(ds7, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
+d_s7 <- ts(ds7, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 # d_s8 <- ts(ds8, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 # d_s9 <- ts(ds7, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 # d_s10 <- ts(ds8, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
@@ -802,30 +802,30 @@ scale_x_continuous(breaks = tiempos_x, labels = fechas_labels) +
 
 ### LUNES
 ```{r}
-dias <- c("lunes.14.sept","lunes.21.sept","lunes.28.sept","lunes.05.octubre",
-          "martes.15.sept","martes.22.sept","martes.29.sept","martes.06.octubre",
-          "miercoles.16.sept","miercoles.23.sept","miercoles.30.sept","miercoles.07.octubre",
-          "jueves.17.sept","jueves.24.sept","jueves.01.octubre","jueves.08.octubre",
-          "viernes.18.sept","viernes.25.sept","viernes.02.octubre","viernes.09.octubre",
-          "sabado.19.sept","sabado.26.sept","sabado.03.octubre","sabado.10.octubre",
-          "domingo.20.sept","domingo.27.sept","domingo.04.octubre","domingo.11.octubre")
-fechas <- c("2026-09-07","2026-09-14","2026-09-21","2026-09-28","2026-10-05",
-            "2026-09-08","2026-09-15","2026-09-22","2026-09-29","2026-10-06",
-            "2026-09-09","2026-09-16","2026-09-23","2026-09-30","2026-10-07",
-            "2026-09-10","2026-09-17","2026-09-24","2026-10-01","2026-10-08",
-            "2026-09-11","2026-09-18","2026-09-25","2026-10-02","2026-10-09",
-            "2026-09-12","2026-09-19","2026-09-26","2026-10-03","2026-10-10",
-            "2026-09-13","2026-09-20","2026-09-27","2026-10-04","2026-10-11")
+dias <- c("lunes.21.sept","lunes.28.sept","lunes.05.octubre","lunes.12.octubre",
+          "martes.22.sept","martes.29.sept","martes.06.octubre","martes.13.octubre",
+          "miercoles.23.sept","miercoles.30.sept","miercoles.07.octubre","miercoles.14.octubre",
+          "jueves.24.sept","jueves.01.octubre","jueves.08.octubre","jueves.15.octubre",
+          "viernes.25.sept","viernes.02.octubre","viernes.09.octubre","viernes.16.octubre",
+          "sabado.26.sept","sabado.03.octubre","sabado.10.octubre","sabado.17.octubre",
+          "domingo.27.sept","domingo.04.octubre","domingo.11.octubre","domingo.18.octubre")
+fechas <- c("2026-09-14","2026-09-21","2026-09-28","2026-10-05","2026-10-12",
+            "2026-09-15","2026-09-22","2026-09-29","2026-10-06","2026-10-13",
+            "2026-09-16","2026-09-23","2026-09-30","2026-10-07","2026-10-14",
+            "2026-09-17","2026-09-24","2026-10-01","2026-10-08","2026-10-15",
+            "2026-09-18","2026-09-25","2026-10-02","2026-10-09","2026-10-16",
+            "2026-09-19","2026-09-26","2026-10-03","2026-10-10","2026-10-17",
+            "2026-09-20","2026-09-27","2026-10-04","2026-10-11","2026-10-18")
 
 for (i in 1:length(dias)) {assign(dias[i], df %>% 
                                     filter(format(fecha, "%Y-%m-%d") == fechas[i]))}
 
-dias <- list(lunes.14.sept,lunes.21.sept,lunes.28.sept,lunes.05.octubre)
-dias_nombres <- c("Lunes 14 Septiembre","Lunes 21 Septiembre","Lunes 28 Septiembre","Lunes 05 Octubre")
+dias <- list(lunes.21.sept,lunes.28.sept,lunes.05.octubre,lunes.12.octubre)
+dias_nombres <- c("Lunes 21 Septiembre","Lunes 28 Septiembre","Lunes 05 Octubre","Lunes 12 Octubre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-05", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-10-12", format(df_semana$fecha, "%H:%M:%S")))
 library(ggthemes)
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -853,12 +853,12 @@ data_lunes <- df_semana
 ### MARTES
 
 ```{r}
-dias <- list(martes.15.sept,martes.22.sept,martes.29.sept,martes.06.octubre)
-dias_nombres <- c("Martes 15 Septiembre","Martes 22 Septiembre","Martes 29 Septiembre","Martes 06 Octubre")
+dias <- list(martes.22.sept,martes.29.sept,martes.06.octubre,martes.13.octubre)
+dias_nombres <- c("Martes 22 Septiembre","Martes 29 Septiembre","Martes 06 Octubre","Martes 13 Octubre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-06", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-10-13", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -887,12 +887,12 @@ data_martes <- df_semana
 ### MIERCOLES
 
 ```{r}
-dias <- list(miercoles.16.sept,miercoles.23.sept,miercoles.30.sept,miercoles.07.octubre)
-dias_nombres <- c("Miercoles 16 Septiembre","Miercoles 23 Septiembre","Miercoles 30 Septiembre","Miercoles 07 Octubre")
+dias <- list(miercoles.23.sept,miercoles.30.sept,miercoles.07.octubre,miercoles.14.octubre)
+dias_nombres <- c("Miercoles 23 Septiembre","Miercoles 30 Septiembre","Miercoles 07 Octubre","Miercoles 14 Octubre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-07", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-10-14", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -920,12 +920,12 @@ data_miercoles <- df_semana
 ### JUEVES 
 
 ```{r}
-dias <- list(jueves.17.sept,jueves.24.sept,jueves.01.octubre,jueves.08.octubre)
-dias_nombres <- c("Jueves 17 Septiembre","Jueves 24 Septiembre","Jueves 01 Octubre","Jueves 08 Octubre")
+dias <- list(jueves.24.sept,jueves.01.octubre,jueves.08.octubre,jueves.15.octubre)
+dias_nombres <- c("Jueves 24 Septiembre","Jueves 01 Octubre","Jueves 08 Octubre","Jueves 15 Octubre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-08", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-10-15", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -953,12 +953,12 @@ data_jueves <- df_semana
 ### VIERNES
 
 ```{r}
-dias <- list(viernes.18.sept,viernes.25.sept,viernes.02.octubre,viernes.09.octubre)
-dias_nombres <- c("Viernes 18 Septiembre","Viernes 25 Septiembre","Viernes 02 Octubre","Viernes 09 Octubre")
+dias <- list(viernes.25.sept,viernes.02.octubre,viernes.09.octubre,viernes.16.octubre)
+dias_nombres <- c("Viernes 25 Septiembre","Viernes 02 Octubre","Viernes 09 Octubre","Viernes 16 Octubre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-09", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-10-16", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -986,12 +986,12 @@ data_viernes <- df_semana
 ### SABADO
 
 ```{r}
-dias <- list(sabado.19.sept,sabado.26.sept,sabado.03.octubre,sabado.10.octubre)
-dias_nombres <- c("Sabado 19 Septiembre","Sabado 26 Septiembre","Sabado 03 Octubre","Sabado 10 Octubre")
+dias <- list(sabado.26.sept,sabado.03.octubre,sabado.10.octubre,sabado.17.octubre)
+dias_nombres <- c("Sabado 26 Septiembre","Sabado 03 Octubre","Sabado 10 Octubre","Sabado 17 Octubre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-10", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-10-17", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -1019,12 +1019,12 @@ data_sabado <- df_semana
 ### DOMINGO
 
 ```{r}
-dias <- list(domingo.20.sept,domingo.27.sept,domingo.04.octubre,domingo.11.octubre)
-dias_nombres <- c("Domingo 20 Septiembre","Domingo 27 Septiembre","Domingo 04 Octubre","Domingo 11 Octubre")
+dias <- list(domingo.27.sept,domingo.04.octubre,domingo.11.octubre,domingo.18.octubre)
+dias_nombres <- c("Domingo 27 Septiembre","Domingo 04 Octubre","Domingo 11 Octubre","Domingo 18 Octubre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-11", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-10-18", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -1508,6 +1508,102 @@ plot_ly(data = databcb_var, x = ~fecha) %>%
 
 ## Column 1 { .tabset}
 ### Compra - Tipo de cambio Flexible
+
+```{r}
+library(rvest)
+library(dplyr)
+library(readr)
+library(knitr)
+library(kableExtra)
+
+url_bcb_tabla <- "https://www.bcb.gob.bo/bcb_tco_publico_ultima_cotizacion.php"
+
+# ---- 1. Extraer tabla y fecha de corte ---------------------------------
+obtener_tco_bcb <- function(url) {
+  tryCatch({
+    pagina <- read_html(url)
+
+    tabla_bruta <- pagina %>%
+      html_element(".tco-public-card table") %>%   # o simplemente "table"
+      html_table()
+
+    subtitulo <- pagina %>%
+      html_element("span.tco-public-date") %>%
+      html_text2()
+
+    if (is.null(tabla_bruta) || nrow(tabla_bruta) == 0) {
+      stop("No se pudo localizar la tabla en la estructura del recurso.")
+    }
+    if (is.na(subtitulo) || subtitulo == "") subtitulo <- " "
+
+    loc_es <- locale(decimal_mark = ",", grouping_mark = ".")
+
+    tabla <- tabla_bruta %>%
+      setNames(c("Entidad", "Compra", "Monto", "Transacciones")) %>%
+      mutate(across(-Entidad, ~ parse_number(as.character(.x), locale = loc_es)))
+
+    list(tabla = tabla, subtitulo = subtitulo)
+
+  }, error = function(e) {
+    message("Error al conectar o procesar la web del BCB: ", e$message)
+    NULL
+  })
+}
+
+# ---- 2. Funciones auxiliares -------------------------------------------
+fmt_es <- function(x, dec = 0) {
+  formatC(x, format = "f", digits = dec, big.mark = ".", decimal.mark = ",")
+}
+
+# Barra proporcional; la escala se calcula SIN la fila de totales
+barra_col <- function(x, texto, es_total, clase, desde_cero = TRUE) {
+  ref <- x[!es_total]
+  rango <- max(ref, na.rm = TRUE) - min(ref, na.rm = TRUE)
+
+  prop <- if (desde_cero || rango == 0) {
+    x / max(ref, na.rm = TRUE)
+  } else {
+    0.15 + 0.85 * (x - min(ref, na.rm = TRUE)) / rango
+  }
+
+  html <- sprintf(
+    '<div class="barra-celda"><span class="barra %s" style="display:inline-block; width:%.1f%%;">%s</span></div>',
+    clase, prop * 100, texto
+  )
+  ifelse(es_total, texto, html)   # la fila de totales va solo como texto
+}
+
+# ---- 3. Construir la tabla ----------------------------------------------
+res <- obtener_tco_bcb(url_bcb_tabla)
+stopifnot(!is.null(res))
+
+titulo <- "TIPO DE CAMBIO OFICIAL DEL DÓLAR ESTADOUNIDENSE"
+
+# Detecta la fila de totales ("TOTAL", "TOTALES", etc.)
+es_total <- grepl("^\\s*total", res$tabla$Entidad, ignore.case = TRUE)
+
+df <- res$tabla %>%
+  mutate(
+    Compra        = barra_col(Compra,        fmt_es(Compra, 2),        es_total, "barra-compra", desde_cero = FALSE),
+    Monto         = barra_col(Monto,         fmt_es(Monto, 2),         es_total, "barra-monto"),
+    Transacciones = barra_col(Transacciones, fmt_es(Transacciones, 0), es_total, "barra-transacciones")
+  )
+
+tabla_kable <- df %>%
+  kable(
+    format = "html", escape = FALSE,
+    col.names = c("Entidad", "Compra (Bs/$us)", "Monto ($us)", "Número de transacciones"),
+    align = c("l", "r", "r", "r"),
+    table.attr = 'class="tabla-tco"'
+  ) %>%
+  add_header_above(setNames(4, res$subtitulo)) %>%
+  add_header_above(setNames(4, titulo))
+
+tabla_kable
+```
+
+
+
 ```{r eval=FALSE, include=FALSE}
 library(rvest)
 library(dplyr)
