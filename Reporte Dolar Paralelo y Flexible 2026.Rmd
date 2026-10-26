@@ -2823,7 +2823,7 @@ data_real_long <- data_real %>%
   pivot_longer(cols = c(Binance, BCB_Flexible), names_to = "Serie", values_to = "Valor")
 
 ggplot(data_real_long, aes(x = x, y = Valor, color = Serie, group = Serie)) +
-  geom_l  ine(linewidth = 1.2, na.rm = TRUE) +
+  geom_line(linewidth = 1.2, na.rm = TRUE) +
   geom_point(size = 3, na.rm = TRUE) +
   geom_text(aes(label = ifelse(is.na(Valor), "", Valor)),
             vjust = -1.2, size = 3.2, fontface = "bold", show.legend = FALSE, na.rm = TRUE) +
