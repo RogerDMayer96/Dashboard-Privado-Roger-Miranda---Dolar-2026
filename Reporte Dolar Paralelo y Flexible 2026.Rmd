@@ -2729,7 +2729,7 @@ ggplot(data = data_prueba, aes(x = x, y = y, group = 1)) +
   scale_y_continuous(expand = expansion(mult = c(0.1, 0.2))) +
   labs(
     title = "Modelos ARIMA diarios consolidados (Ajustados)",
-    subtitle = "Septiembre 2026",
+    subtitle = "Octubre 2026",
     x = "Día de la semana",
     y = "Valor Bs/USDT") +
   # 4. Construcción del entorno Dark con theme_minimal y overrides de color
@@ -2823,7 +2823,7 @@ data_real_long <- data_real %>%
   pivot_longer(cols = c(Binance, BCB_Flexible), names_to = "Serie", values_to = "Valor")
 
 ggplot(data_real_long, aes(x = x, y = Valor, color = Serie, group = Serie)) +
-  geom_line(linewidth = 1.2, na.rm = TRUE) +
+  geom_l  ine(linewidth = 1.2, na.rm = TRUE) +
   geom_point(size = 3, na.rm = TRUE) +
   geom_text(aes(label = ifelse(is.na(Valor), "", Valor)),
             vjust = -1.2, size = 3.2, fontface = "bold", show.legend = FALSE, na.rm = TRUE) +
