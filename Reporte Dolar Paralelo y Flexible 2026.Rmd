@@ -663,24 +663,25 @@ ds4 <- c(0,0,0,0,1,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#5
 
-# ds5 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          1,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#31
-# 
-# ds6 <- c(0,0,0,0,0,0,0,1,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#8
+ds5 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,1,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#50
 
-# ds7 <- c(0,0,0,0,0,0,0,1,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#8
-# ds8 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
-#          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#18
+ds6 <- c(0,0,0,1,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#4
+
+ds7 <- c(0,0,0,0,0,0,0,0,0,0,   1,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#11
+
+ds8 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0)#49
 
 # ds9 <- c(0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,1,0,     0,0,0,0,0,0,0,0,0,0,
 #          0,0,0,0,0,0,0,0,0,0,   0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,
@@ -696,18 +697,18 @@ d_s1 <- ts(ds1, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequ
 d_s2 <- ts(ds2, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 d_s3 <- ts(ds3, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 d_s4 <- ts(ds4, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
-# d_s5 <- ts(ds5, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
-# d_s6 <- ts(ds6, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
-# d_s7 <- ts(ds7, start = c(2026, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
-# d_s8 <- ts(ds8, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
+d_s5 <- ts(ds5, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
+d_s6 <- ts(ds6, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
+d_s7 <- ts(ds7, start = c(2026, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
+d_s8 <- ts(ds8, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 # d_s9 <- ts(ds7, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 # d_s10 <- ts(ds8, start = c(2025, isoweek(min(promedio_por_semana$Semana))), frequency = 52)
 
 exogen <- ts.intersect(d_s1,d_s2)
  
 exogen1 <-window(exogen, start = c(2025, isoweek(min(promedio_por_semana$Semana))),
-                 end=c(2026, 44))
-exogen2<-window(exogen, start = c(2026, 45))
+                 end=c(2026, 45))
+exogen2<-window(exogen, start = c(2026, 46))
 
 exogen2 <- matrix(0, nrow = 14, ncol = 1)
 
@@ -735,8 +736,8 @@ pronostico <- forecast(modelo1,
 pronostico2026 <- data.frame(pronostico)
 
 pronostico2026 <- pronostico2026 %>% 
-  mutate(Fecha = c("08/NOV/2026","15/NOV/2026","22/NOV/2026","29/NOV/2026",
-                   "06/DIC/2026","13/DIC/2026")) %>% 
+  mutate(Fecha = c("15/NOV/2026","22/NOV/2026","29/NOV/2026",
+                   "06/DIC/2026","13/DIC/2026","20/DIC/2026")) %>% 
   select(Fecha, everything())
 
 pronostico2026$Point.Forecast <- round(pronostico2026$Point.Forecast,2)
@@ -761,7 +762,7 @@ pronostico2026$Hi.95 <- round(pronostico2026$Hi.95,2)
 
 row.names(pronostico2026) <- NULL
 kable(pronostico2026,
-      caption = "Pronóstico del valor del Dólar USDT para el 2026 - OCTUBRE (Semanal)") %>%
+      caption = "Pronóstico del valor del Dólar USDT para el 2026 - Noviembre (Semanal)") %>%
 kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
                 full_width = FALSE, font_size = 12) %>%
   kable_minimal()
@@ -769,7 +770,7 @@ kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
 
 ### Gráfica
 ```{r, fig.width=10, fig.height=6}
-fechas_labels <- c("08 Noviembre 26","15 Noviembre 26","22 Noviembre 26","29 Noviembre 26","06 Diciembre 26","13 Diciembre 26")
+fechas_labels <- c("15 Noviembre 26","22 Noviembre 26","29 Noviembre 26","06 Diciembre 26","13 Diciembre 26","20 Diciembre 26")
 tiempos_x <- as.numeric(time(pronostico$mean))
 
 autoplot(pronostico) +
@@ -780,7 +781,7 @@ autoplot(pronostico) +
   geom_hline(yintercept = pronostico2026$Hi.95[1], linetype = "dashed",
              color = "red", size = 1.1) +
 scale_x_continuous(breaks = tiempos_x, labels = fechas_labels) +
-  coord_cartesian(xlim=c(2026.4,2026.925), ylim=c(9,14.5)) +
+  coord_cartesian(xlim=c(2026.4,2026.945), ylim=c(9,14.5)) +
   labs(title = "Proyección del promedio semanal (Bs) del Dólar Blue",
     subtitle = "Octubre 2026", y = "Promedio Bs", x = "")  + theme_minimal() +
   theme(plot.background = element_rect(fill = "#0d1117", color = NA),
@@ -801,30 +802,30 @@ scale_x_continuous(breaks = tiempos_x, labels = fechas_labels) +
 
 ### LUNES
 ```{r}
-dias <- c("lunes.05.octubre","lunes.12.octubre","lunes.19.octubre","lunes.26.octubre",
-          "martes.06.octubre","martes.13.octubre","martes.20.octubre","martes.27.octubre",
-          "miercoles.07.octubre","miercoles.14.octubre","miercoles.21.octubre","miercoles.28.octubre",
-          "jueves.08.octubre","jueves.15.octubre","jueves.22.octubre","jueves.29.octubre",
-          "viernes.09.octubre","viernes.16.octubre","viernes.23.octubre","viernes.30.octubre",
-          "sabado.10.octubre","sabado.17.octubre","sabado.24.octubre","sabado.31.octubre",
-          "domingo.11.octubre","domingo.18.octubre","domingo.25.octubre","domingo.01.noviembre")
-fechas <- c("2026-09-21","2026-09-28","2026-10-05","2026-10-12","2026-10-19","2026-10-26",
-            "2026-09-22","2026-09-29","2026-10-06","2026-10-13","2026-10-20","2026-10-27",
-            "2026-09-23","2026-09-30","2026-10-07","2026-10-14","2026-10-21","2026-10-28",
-            "2026-09-24","2026-10-01","2026-10-08","2026-10-15","2026-10-22","2026-10-29",
-            "2026-09-25","2026-10-02","2026-10-09","2026-10-16","2026-10-23","2026-10-30",
-            "2026-09-26","2026-10-03","2026-10-10","2026-10-17","2026-10-24","2026-10-31",
-            "2026-09-27","2026-10-04","2026-10-11","2026-10-18","2026-10-25","2026-11-01")
+dias <- c("lunes.12.octubre","lunes.19.octubre","lunes.26.octubre","lunes.02.noviembre",
+          "martes.13.octubre","martes.20.octubre","martes.27.octubre","martes.03.noviembre",
+          "miercoles.14.octubre","miercoles.21.octubre","miercoles.28.octubre","miercoles.04.noviembre",
+          "jueves.15.octubre","jueves.22.octubre","jueves.29.octubre","jueves.05.noviembre",
+          "viernes.16.octubre","viernes.23.octubre","viernes.30.octubre","viernes.06.noviembre",
+          "sabado.17.octubre","sabado.24.octubre","sabado.31.octubre","sabado.07.noviembre",
+          "domingo.18.octubre","domingo.25.octubre","domingo.01.noviembre","domingo.08.noviembre")
+fechas <- c("2026-09-28","2026-10-05","2026-10-12","2026-10-19","2026-10-26","2026-11-02",
+            "2026-09-29","2026-10-06","2026-10-13","2026-10-20","2026-10-27","2026-11-03",
+            "2026-09-30","2026-10-07","2026-10-14","2026-10-21","2026-10-28","2026-11-04",
+            "2026-10-01","2026-10-08","2026-10-15","2026-10-22","2026-10-29","2026-11-05",
+            "2026-10-02","2026-10-09","2026-10-16","2026-10-23","2026-10-30","2026-11-06",
+            "2026-10-03","2026-10-10","2026-10-17","2026-10-24","2026-10-31","2026-11-07",
+            "2026-10-04","2026-10-11","2026-10-18","2026-10-25","2026-11-01","2026-11-08")
 
 for (i in 1:length(dias)) {assign(dias[i], df %>% 
                                     filter(format(fecha, "%Y-%m-%d") == fechas[i]))}
 
-dias <- list(lunes.05.octubre,lunes.12.octubre,lunes.19.octubre,lunes.26.octubre)
-dias_nombres <- c("Lunes 05 Octubre","Lunes 12 Octubre","Lunes 19 Octubre","Lunes 26 Octubre")
+dias <- list(lunes.12.octubre,lunes.19.octubre,lunes.26.octubre,lunes.02.noviembre)
+dias_nombres <- c("Lunes 12 Octubre","Lunes 19 Octubre","Lunes 26 Octubre","Lunes 02 Noviembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-26", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-11-02", format(df_semana$fecha, "%H:%M:%S")))
 library(ggthemes)
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -852,12 +853,12 @@ data_lunes <- df_semana
 ### MARTES
 
 ```{r}
-dias <- list(martes.06.octubre,martes.13.octubre,martes.20.octubre,martes.27.octubre)
-dias_nombres <- c("Martes 06 Octubre","Martes 13 Octubre","Martes 20 Octubre","Martes 27 Octubre")
+dias <- list(martes.13.octubre,martes.20.octubre,martes.27.octubre,martes.03.noviembre)
+dias_nombres <- c("Martes 13 Octubre","Martes 20 Octubre","Martes 27 Octubre","Martes 03 Noviembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-27", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-11-03", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -886,12 +887,12 @@ data_martes <- df_semana
 ### MIERCOLES
 
 ```{r}
-dias <- list(miercoles.07.octubre,miercoles.14.octubre,miercoles.21.octubre,miercoles.28.octubre)
-dias_nombres <- c("Miercoles 07 Octubre","Miercoles 14 Octubre","Miercoles 21 Octubre","Miercoles 28 Octubre")
+dias <- list(miercoles.14.octubre,miercoles.21.octubre,miercoles.28.octubre,miercoles.04.noviembre)
+dias_nombres <- c("Miercoles 14 Octubre","Miercoles 21 Octubre","Miercoles 28 Octubre","Miercoles 04 Noviembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-28", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-11-04", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -919,12 +920,12 @@ data_miercoles <- df_semana
 ### JUEVES 
 
 ```{r}
-dias <- list(jueves.08.octubre,jueves.15.octubre,jueves.22.octubre,jueves.29.octubre)
-dias_nombres <- c("Jueves 08 Octubre","Jueves 15 Octubre","Jueves 22 Octubre","Jueves 29 Octubre")
+dias <- list(jueves.15.octubre,jueves.22.octubre,jueves.29.octubre,jueves.05.noviembre)
+dias_nombres <- c("Jueves 15 Octubre","Jueves 22 Octubre","Jueves 29 Octubre","Jueves 05 Noviembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-29", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-11-05", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -952,12 +953,12 @@ data_jueves <- df_semana
 ### VIERNES
 
 ```{r}
-dias <- list(viernes.09.octubre,viernes.16.octubre,viernes.23.octubre,viernes.30.octubre)
-dias_nombres <- c("Viernes 09 Octubre","Viernes 16 Octubre","Viernes 23 Octubre","Viernes 30 Octubre")
+dias <- list(viernes.16.octubre,viernes.23.octubre,viernes.30.octubre,viernes.06.noviembre)
+dias_nombres <- c("Viernes 16 Octubre","Viernes 23 Octubre","Viernes 30 Octubre","Viernes 06 Noviembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-30", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-11-05", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -985,12 +986,12 @@ data_viernes <- df_semana
 ### SABADO
 
 ```{r}
-dias <- list(sabado.10.octubre,sabado.17.octubre,sabado.24.octubre,sabado.31.octubre)
-dias_nombres <- c("Sabado 10 Octubre","Sabado 17 Octubre","Sabado 24 Octubre","Sabado 31 Octubre")
+dias <- list(sabado.17.octubre,sabado.24.octubre,sabado.31.octubre,sabado.07.noviembre)
+dias_nombres <- c("Sabado 17 Octubre","Sabado 24 Octubre","Sabado 31 Octubre","Sabado 07 Noviembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-10-31", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-11-07", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -1018,12 +1019,12 @@ data_sabado <- df_semana
 ### DOMINGO
 
 ```{r}
-dias <- list(domingo.11.octubre,domingo.18.octubre,domingo.25.octubre,domingo.01.noviembre)
-dias_nombres <- c("Domingo 11 Octubre","Domingo 18 Octubre","Domingo 25 Octubre","Domingo 01 Noviembre")
+dias <- list(domingo.18.octubre,domingo.25.octubre,domingo.01.noviembre,domingo.08.noviembre)
+dias_nombres <- c("Domingo 18 Octubre","Domingo 25 Octubre","Domingo 01 Noviembre","Domingo 08 Noviembre")
 
 df_semana <- do.call(rbind, dias)
 df_semana$dia <- factor(rep(dias_nombres, sapply(dias, nrow)), levels = dias_nombres)
-df_semana$hora <- as.POSIXct(paste("2026-11-01", format(df_semana$fecha, "%H:%M:%S")))
+df_semana$hora <- as.POSIXct(paste("2026-11-08", format(df_semana$fecha, "%H:%M:%S")))
 
 a <- ggplot(df_semana, aes(x = hora, y = (precio))) +
   geom_line(color="#0D5C63") +
@@ -2228,7 +2229,7 @@ modelo1 <- Arima(ts_semana_lunes, order = c(4,2,0), xreg = as.matrix(exogen1), i
 
 exogen2 <- matrix(0, nrow = 4, ncol = ncol(modelo1$xreg))
 # 3. Ejecuta el pronóstico (ahora sí funcionará sin errores)
-pronostico <- forecast(modelo1, h = 4, level = c(1), xreg = exogen2)
+pronostico <- forecast(modelo1, h = 4, level = c(15), xreg = exogen2)
 pronostico_lunes <- pronostico$lower[1]
 
 # ==============================================================================
@@ -2303,7 +2304,7 @@ modelo1_mar <- Arima(ts_semana_martes, order = c(3,2,1), xreg = as.matrix(exogen
 # Box.test(resid01, type="Ljung-Box")
 
 exogen2_mar <- matrix(0, nrow = 4, ncol = ncol(modelo1_mar$xreg))
-pronostico_mar <- forecast(modelo1_mar, h = 4, level = c(1), xreg = exogen2_mar)
+pronostico_mar <- forecast(modelo1_mar, h = 4, level = c(15), xreg = exogen2_mar)
 pronostico_martes <- pronostico_mar$lower[1]
 
 # ==============================================================================
@@ -2385,9 +2386,8 @@ modelo1_mie <- Arima(ts_semana_miercoles, order = c(1,1,0), xreg = as.matrix(exo
 # Box.test(resid01, type="Ljung-Box")
 
 exogen2_mie <- matrix(0, nrow = 4, ncol = ncol(modelo1_mie$xreg))
-pronostico_mie <- forecast(modelo1_mie, h = 4, level = c(1), xreg = exogen2_mie)
+pronostico_mie <- forecast(modelo1_mie, h = 4, level = c(15), xreg = exogen2_mie)
 pronostico_miercoles <- pronostico_mie$lower[1]
-
 
 # JUEVES
 # ==============================================================================
@@ -2452,7 +2452,7 @@ ds6_jue <- ts(c(0,0,0,0,0,0,0,1,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,
 #                 0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0),
 #           start = c(2025, 30), frequency = 52) #28
 
-exogen_jue <- cbind(ds1_jue,ds2_jue,ds3_jue,ds4_jue)
+exogen_jue <- cbind(ds1_jue,ds2_jue,ds3_jue)
 exogen1_jue <- head(exogen_jue, length(ts_semana_jueves))
 
 modelo1_jue <- Arima(ts_semana_jueves, order = c(0,1,0), xreg = as.matrix(exogen1_jue), include.mean = TRUE)
@@ -2464,7 +2464,7 @@ modelo1_jue <- Arima(ts_semana_jueves, order = c(0,1,0), xreg = as.matrix(exogen
 # Box.test(resid01, type="Ljung-Box")
 
 exogen2_jue <- matrix(0, nrow = 4, ncol = ncol(modelo1_jue$xreg))
-pronostico_jue <- forecast(modelo1_jue, h = 4, level = c(1), xreg = exogen2_jue)
+pronostico_jue <- forecast(modelo1_jue, h = 4, level = c(15), xreg = exogen2_jue)
 pronostico_jueves <- pronostico_jue$lower[1]
 
 # ==============================================================================
@@ -2532,7 +2532,7 @@ ds5_vie <- ts(c(0,0,0,0,1,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,
 #           start = c(2025, 30), frequency = 52) #5
 
 
-exogen_vie <- cbind(ds1_vie,ds2_vie,ds3_vie)
+exogen_vie <- cbind(ds1_vie,ds2_vie)
 exogen1_vie <- head(exogen_vie, length(ts_semana_viernes))
 
 modelo1_vie <- Arima(ts_semana_viernes, order = c(0,1,0), xreg = as.matrix(exogen1_vie), include.mean = TRUE)
@@ -2544,7 +2544,7 @@ modelo1_vie <- Arima(ts_semana_viernes, order = c(0,1,0), xreg = as.matrix(exoge
 # Box.test(resid01, type="Ljung-Box")
 
 exogen2_vie <- matrix(0, nrow = 4, ncol = ncol(modelo1_vie$xreg))
-pronostico_vie <- forecast(modelo1_vie, h = 4, level = c(1), xreg = exogen2_vie)
+pronostico_vie <- forecast(modelo1_vie, h = 4, level = c(15), xreg = exogen2_vie)
 pronostico_viernes <- pronostico_vie$lower[1]
 
 # ==============================================================================
@@ -2612,7 +2612,7 @@ ds6_sab <- ts(c(0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,0,0,0,     0,0,0,0,0,0,0,
 #           start = c(2025, 30), frequency = 52) #12
 
 
-exogen_sab <- cbind(ds1_sab,ds2_sab)
+exogen_sab <- cbind(ds1_sab,ds2_sab,ds3_sab)
 exogen1_sab <- head(exogen_sab, length(ts_semana_sabado))
 
 modelo1_sab <- Arima(ts_semana_sabado, order = c(0,1,0), xreg = as.matrix(exogen1_sab), include.mean = TRUE)
@@ -2624,7 +2624,7 @@ modelo1_sab <- Arima(ts_semana_sabado, order = c(0,1,0), xreg = as.matrix(exogen
 # Box.test(resid01, type="Ljung-Box")
  
 exogen2_sab <- matrix(0, nrow = 4, ncol = ncol(modelo1_sab$xreg))
-pronostico_sab <- forecast(modelo1_sab, h = 4, level = c(1), xreg = exogen2_sab)
+pronostico_sab <- forecast(modelo1_sab, h = 4, level = c(15), xreg = exogen2_sab)
 pronostico_sabado <- pronostico_sab$lower[1]
 
 # ==============================================================================
@@ -2698,14 +2698,14 @@ modelo1_dom <- Arima(ts_semana_domingo, order = c(2,2,2), xreg = as.matrix(exoge
 # Box.test(resid01, type="Ljung-Box")
  
 exogen2_dom <- matrix(0, nrow = 4, ncol = ncol(modelo1_dom$xreg))
-pronostico_dom <- forecast(modelo1_dom, h = 4, level = c(1), xreg = exogen2_dom)
+pronostico_dom <- forecast(modelo1_dom, h = 4, level = c(15), xreg = exogen2_dom)
 pronostico_domingo <- pronostico_dom$lower[1]
 
 
 library(ggplot2)
 
-x <- c("Lunes 02 Noviembre","Martes 03 Noviembre","Miercoles 04 Noviembre","Jueves 05 Noviembre",
-       "Viernes 06 Noviembre","Sabado 07 Noviembre","Domingo 08 Noviembre")
+x <- c("Lunes 09 Noviembre","Martes 10 Noviembre","Miercoles 11 Noviembre","Jueves 12 Noviembre",
+       "Viernes 13 Noviembre","Sabado 14 Noviembre","Domingo 15 Noviembre")
 # Tu vector de referencia
 y <- c(pronostico_lunes,pronostico_martes,pronostico_miercoles,pronostico_jueves,
        pronostico_viernes,pronostico_sabado,pronostico_domingo)# original
